@@ -1,0 +1,3623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Learning Hub - Tutor AI</title>
+    <!-- PDF.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Tesseract.js for OCR (handwriting recognition) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="theme-gold-black.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Navigation Bar */
+        nav {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 0;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 0;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem 2rem 2rem;
+        }
+        
+        .upload-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .upload-section h2 {
+            color: #2a5298;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        #fileInput {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            width: 100%;
+            background: #f8f9ff;
+            cursor: pointer;
+        }
+        
+        #fileInput:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+        
+        #loadingStatus {
+            font-size: 0.9rem;
+            min-height: 20px;
+            padding: 0.5rem;
+            border-radius: 6px;
+        }
+        
+        .language-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        
+        .language-toggle button {
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .language-toggle button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .content-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        @media (min-width: 768px) {
+            .content-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .content-section {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .notes, .quiz, .flashcards {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .notes:hover, .quiz:hover, .flashcards:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+        
+        .notes h3, .quiz h3, .flashcards h3 {
+            color: #2a5298;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        #notesContent, #mcqContent, #writtenContent {
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: #ffffff !important;
+            color: #000000 !important;
+            border-radius: 8px;
+            border: 1px solid #d4af37;
+            margin: 1rem 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        #notesContent {
+            font-family: 'Georgia', serif;
+        }
+        
+        #notesContent::-webkit-scrollbar,
+        #mcqContent::-webkit-scrollbar,
+        #writtenContent::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #notesContent::-webkit-scrollbar-track,
+        #mcqContent::-webkit-scrollbar-track,
+        #writtenContent::-webkit-scrollbar-track {
+            background: #f0e68c;
+            border-radius: 4px;
+        }
+        
+        #notesContent::-webkit-scrollbar-thumb,
+        #mcqContent::-webkit-scrollbar-thumb,
+        #writtenContent::-webkit-scrollbar-thumb {
+            background: #d4af37;
+            border-radius: 4px;
+        }
+        
+        #notesContent::-webkit-scrollbar-thumb:hover,
+        #mcqContent::-webkit-scrollbar-thumb:hover,
+        #writtenContent::-webkit-scrollbar-thumb:hover {
+            background: #b8941e;
+        }
+        
+        .chat {
+            margin-top: 2rem;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        
+        .chat h3 {
+            color: #2a5298;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            border: 1px solid #d4af37;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #ffffff !important;
+            color: #000000 !important;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f0e68c;
+            border-radius: 4px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #d4af37;
+            border-radius: 4px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #b8941e;
+        }
+        
+        #chatInput {
+            width: calc(100% - 120px);
+            padding: 0.75rem;
+            border: 2px solid #e0e7ff;
+            border-radius: 8px;
+            margin-right: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        #chatInput:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .mcq, .written, .flashcard {
+            margin-bottom: 1rem;
+        }
+        
+        .flashcard {
+            perspective: 1000px;
+            cursor: pointer;
+            margin: 1rem 0;
+        }
+        
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            padding: 2rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .flashcard-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .flashcard-back {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+        
+        #ocrProgress {
+            margin-top: 1rem;
+        }
+        
+        #ocrProgress > div {
+            background: #e0e7ff;
+            border-radius: 8px;
+            height: 24px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        #progressBar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        #progressText {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .notes, .quiz, .flashcards, .chat {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 0.5rem;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 0 1rem 1rem 1rem;
+            }
+            
+            #chatInput {
+                width: calc(100% - 100px);
+            }
+            
+            .content-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Success/Error messages */
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                Tutor AI
+            </a>
+            <button class="menu-toggle" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="student.html" class="active"><i class="fas fa-book-reader"></i> Student</a></li>
+                <li><a href="ai-converter.html"><i class="fas fa-robot"></i> AI Converter</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <header>
+        <h1><i class="fas fa-graduation-cap"></i> Tutor AI</h1>
+        <p>Upload your study material and get explanations, notes, quizzes, and flashcards in Hindi and English!</p>
+    </header>
+    <div class="container">
+        <div class="upload-section">
+            <h2><i class="fas fa-upload"></i> Upload Study Material</h2>
+            <input type="file" id="fileInput" accept=".txt,.pdf">
+            <button onclick="loadFile()"><i class="fas fa-file-import"></i> Load File</button>
+            <div id="loadingStatus" style="margin-top: 1rem; color: #666;"></div>
+            <div id="ocrProgress" style="margin-top: 0.5rem; display: none;">
+                <div style="background: #e0e0e0; border-radius: 4px; height: 20px; overflow: hidden;">
+                    <div id="progressBar" style="background: #007bff; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                </div>
+                <p id="progressText" style="margin-top: 0.5rem; font-size: 0.9rem;"></p>
+            </div>
+        </div>
+        <div class="language-toggle">
+            <button onclick="setLanguage('en')"><i class="fas fa-flag-usa"></i> English</button>
+            <button onclick="setLanguage('hi')"><i class="fas fa-flag"></i> हिंदी</button>
+            <button onclick="setLanguage('hinglish')"><i class="fas fa-language"></i> Hinglish</button>
+        </div>
+        <div class="content-section">
+            <div class="notes">
+                <h3><i class="fas fa-book"></i> Notes</h3>
+                <div id="notesContent" style="min-height: 100px;"></div>
+                <button onclick="generateNotes()"><i class="fas fa-magic"></i> Generate Notes</button>
+                <button onclick="copyNotes()" style="margin-left: 0.5rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%);"><i class="fas fa-copy"></i> Copy</button>
+                <button onclick="downloadNotes()" style="margin-left: 0.5rem; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);"><i class="fas fa-download"></i> Download</button>
+                <button onclick="toggleReadNotes()" id="readNotesBtn" style="margin-left: 0.5rem; background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);"><i class="fas fa-volume-up"></i> Read Aloud</button>
+            </div>
+            <div class="quiz">
+                <h3><i class="fas fa-question-circle"></i> Quiz</h3>
+                <button onclick="generateMCQ()"><i class="fas fa-list-check"></i> Generate MCQ</button>
+                <div id="mcqContent" style="min-height: 100px; margin-top: 1rem;"></div>
+                <button onclick="generateWritten()" style="margin-top: 1rem;"><i class="fas fa-pen"></i> Generate Written Question</button>
+                <div id="writtenContent" style="min-height: 100px; margin-top: 1rem;"></div>
+            </div>
+            <div class="flashcards">
+                <h3><i class="fas fa-layer-group"></i> Flashcards</h3>
+                <button onclick="generateFlashcard()"><i class="fas fa-cards-blank"></i> Generate Flashcard</button>
+                <div id="flashcardContent"></div>
+            </div>
+            <div class="mindmap">
+                <h3><i class="fas fa-project-diagram"></i> Mind Map</h3>
+                <button onclick="generateMindMap()"><i class="fas fa-sitemap"></i> Generate Mind Map</button>
+                <div id="mindmapContainer" style="display: none; margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button onclick="zoomIn()" style="padding: 0.5rem 1rem; font-size: 0.9rem;"><i class="fas fa-search-plus"></i> Zoom In</button>
+                            <button onclick="zoomOut()" style="padding: 0.5rem 1rem; font-size: 0.9rem;"><i class="fas fa-search-minus"></i> Zoom Out</button>
+                            <button onclick="resetZoom()" style="padding: 0.5rem 1rem; font-size: 0.9rem;"><i class="fas fa-undo"></i> Reset</button>
+                        </div>
+                        <button onclick="downloadMindMap()" style="padding: 0.5rem 1rem; font-size: 0.9rem; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);"><i class="fas fa-download"></i> Download</button>
+                    </div>
+                    <canvas id="mindmapCanvas" width="1600" height="1000" style="border: 2px solid #d4af37; border-radius: 8px; background: #1a1a1a; cursor: move; width: 100%; max-width: 1600px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="chat">
+            <h3><i class="fas fa-comments"></i> Ask Questions Anytime</h3>
+            <div class="chat-messages" id="chatMessages"></div>
+            <input type="text" id="chatInput" placeholder="Ask a question...">
+            <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i> Send</button>
+        </div>
+    </div>
+
+    <script>
+        let uploadedText = '';
+        let currentLanguage = 'en';
+        let chatHistory = [];
+        let generatedNotes = '';
+        let flashcards = [];
+        let currentFlashcardIndex = 0;
+        let originalUploadedText = ''; // Store original text for translation
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+        let isReading = false;
+        let currentAudio = null; // For Leo TTS audio
+
+        // API Configuration - Replace with your actual API key
+        const API_KEY = 'YOUR_API_KEY_HERE'; // Use OpenAI, Gemini, or other AI API
+        const API_ENDPOINT = 'https://api.openai.com/v1/chat/completions'; // Example endpoint
+        
+        // Leo TTS Configuration (Turbo AI)
+        const LEO_TTS_API_KEY = 'YOUR_LEO_API_KEY_HERE'; // Replace with your Leo API key
+        const LEO_TTS_ENDPOINT = 'https://api.turbo.ai/v1/tts'; // Leo TTS endpoint
+
+        // Configure PDF.js worker
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
+        async function loadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const statusDiv = document.getElementById('loadingStatus');
+            const progressDiv = document.getElementById('ocrProgress');
+            
+            if (!file) {
+                alert(currentLanguage === 'hi' ? 
+                    'कृपया पहले एक फ़ाइल चुनें।' : 
+                    'Please select a file first.');
+                return;
+            }
+
+            const fileName = file.name.toLowerCase();
+            statusDiv.textContent = currentLanguage === 'hi' ? 
+                `फ़ाइल लोड हो रही है: ${file.name}...` : 
+                `Loading file: ${file.name}...`;
+            statusDiv.style.color = '#666';
+
+            try {
+                if (fileName.endsWith('.txt')) {
+                    await loadTextFile(file);
+                } else if (fileName.endsWith('.pdf')) {
+                    await loadPDFFile(file);
+                } else {
+                    throw new Error('Unsupported file type. Please use .txt or .pdf files.');
+                }
+
+                statusDiv.innerHTML = currentLanguage === 'hi' ? 
+                    `✓ फ़ाइल सफलतापूर्वक लोड हो गई!<br><small>${uploadedText.length} अक्षर निकाले गए</small>` :
+                    `✓ File loaded successfully!<br><small>${uploadedText.length} characters extracted</small>`;
+                statusDiv.style.color = '#28a745';
+                progressDiv.style.display = 'none';
+                
+                // Show a preview button
+                const previewBtn = document.createElement('button');
+                previewBtn.textContent = currentLanguage === 'hi' ? 'टेक्स्ट देखें' : 'View Extracted Text';
+                previewBtn.style.marginTop = '0.5rem';
+                previewBtn.style.fontSize = '0.9rem';
+                previewBtn.onclick = showExtractedText;
+                statusDiv.appendChild(document.createElement('br'));
+                statusDiv.appendChild(previewBtn);
+                
+                explainContent();
+            } catch (error) {
+                console.error('Error loading file:', error);
+                statusDiv.textContent = currentLanguage === 'hi' ? 
+                    `❌ त्रुटि: ${error.message}` :
+                    `❌ Error: ${error.message}`;
+                statusDiv.style.color = '#dc3545';
+                progressDiv.style.display = 'none';
+            }
+        }
+
+        function showExtractedText() {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+            
+            const content = document.createElement('div');
+            content.style.cssText = 'background: white; padding: 2rem; border-radius: 8px; max-width: 800px; max-height: 80vh; overflow-y: auto; position: relative;';
+            
+            const title = document.createElement('h3');
+            title.textContent = currentLanguage === 'hi' ? 'निकाला गया टेक्स्ट' : 'Extracted Text';
+            title.style.marginTop = '0';
+            
+            const textArea = document.createElement('textarea');
+            textArea.value = uploadedText;
+            textArea.style.cssText = 'width: 100%; height: 400px; font-family: monospace; padding: 1rem; border: 1px solid #ddd; border-radius: 4px;';
+            
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.marginTop = '1rem';
+            
+            const editBtn = document.createElement('button');
+            editBtn.textContent = currentLanguage === 'hi' ? 'संपादन सहेजें' : 'Save Edits';
+            editBtn.onclick = () => {
+                uploadedText = textArea.value;
+                alert(currentLanguage === 'hi' ? '✓ परिवर्तन सहेजे गए!' : '✓ Changes saved!');
+                document.body.removeChild(modal);
+            };
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = currentLanguage === 'hi' ? 'बंद करें' : 'Close';
+            closeBtn.style.marginLeft = '0.5rem';
+            closeBtn.style.background = '#6c757d';
+            closeBtn.onclick = () => document.body.removeChild(modal);
+            
+            buttonContainer.appendChild(editBtn);
+            buttonContainer.appendChild(closeBtn);
+            
+            content.appendChild(title);
+            content.appendChild(textArea);
+            content.appendChild(buttonContainer);
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) document.body.removeChild(modal);
+            };
+        }
+
+        async function loadTextFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedText = e.target.result;
+                    resolve();
+                };
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+
+        async function loadPDFFile(file) {
+            const progressDiv = document.getElementById('ocrProgress');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            progressDiv.style.display = 'block';
+            progressText.textContent = currentLanguage === 'hi' ? 
+                'PDF पढ़ा जा रहा है...' : 
+                'Reading PDF...';
+
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const numPages = pdf.numPages;
+            
+            let extractedText = '';
+            
+            for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+                progressBar.style.width = `${(pageNum / numPages) * 50}%`;
+                progressText.textContent = currentLanguage === 'hi' ? 
+                    `पृष्ठ ${pageNum}/${numPages} पढ़ा जा रहा है...` :
+                    `Reading page ${pageNum}/${numPages}...`;
+
+                const page = await pdf.getPage(pageNum);
+                
+                // Try to extract text first
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                
+                // If page has little or no text, use OCR
+                if (pageText.trim().length < 50) {
+                    progressText.textContent = currentLanguage === 'hi' ? 
+                        `पृष्ठ ${pageNum}/${numPages} - हस्तलिखित सामग्री को पहचाना जा रहा है...` :
+                        `Page ${pageNum}/${numPages} - Recognizing handwritten content...`;
+                    
+                    const ocrText = await performOCR(page, pageNum, numPages);
+                    extractedText += ocrText + '\n\n';
+                } else {
+                    extractedText += pageText + '\n\n';
+                }
+            }
+
+            // Apply spell correction
+            progressText.textContent = currentLanguage === 'hi' ? 
+                'टेक्स्ट सुधार जा रहा है...' : 
+                'Correcting text...';
+            progressBar.style.width = '90%';
+            
+            uploadedText = correctOCRErrors(extractedText.trim());
+            
+            progressBar.style.width = '100%';
+            
+            if (uploadedText.length < 50) {
+                throw new Error(currentLanguage === 'hi' ? 
+                    'PDF से पर्याप्त टेक्स्ट नहीं निकाला जा सका। कृपया सुनिश्चित करें कि PDF में पठनीय सामग्री है।' :
+                    'Could not extract enough text from PDF. Please ensure the PDF contains readable content.');
+            }
+        }
+
+        function correctOCRErrors(text) {
+            // Common OCR error corrections
+            const corrections = {
+                // Common character confusions
+                'mogkito': 'mosquito',
+                'mogquito': 'mosquito',
+                'mosguito': 'mosquito',
+                'mcsquito': 'mosquito',
+                'disea5e': 'disease',
+                'di5ease': 'disease',
+                'dlsease': 'disease',
+                'diseose': 'disease',
+                'paras1te': 'parasite',
+                'paras!te': 'parasite',
+                'parasrte': 'parasite',
+                'transm1t': 'transmit',
+                'transm!t': 'transmit',
+                'transrnit': 'transmit',
+                'sympt0m': 'symptom',
+                'sympt0ms': 'symptoms',
+                'symptcm': 'symptom',
+                'symptcms': 'symptoms',
+                'infect1on': 'infection',
+                'infect!on': 'infection',
+                'infectlon': 'infection',
+                'treatrnent': 'treatment',
+                'treatm3nt': 'treatment',
+                'med1cine': 'medicine',
+                'medic1ne': 'medicine',
+                'medicme': 'medicine',
+                'prev3ntion': 'prevention',
+                'prevent1on': 'prevention',
+                'preventlon': 'prevention',
+                'malari4': 'malaria',
+                'malar1a': 'malaria',
+                'malana': 'malaria',
+                'fev3r': 'fever',
+                'fev0r': 'fever',
+                'fevsr': 'fever',
+                'b1ood': 'blood',
+                'bl0od': 'blood',
+                'blcod': 'blood',
+                'c3ll': 'cell',
+                'c0ll': 'cell',
+                'ceII': 'cell',
+                'c3lls': 'cells',
+                'c0lls': 'cells',
+                'ceIIs': 'cells',
+                'prot3in': 'protein',
+                'prote1n': 'protein',
+                'proteln': 'protein',
+                'bacter1a': 'bacteria',
+                'bacter!a': 'bacteria',
+                'bacterla': 'bacteria',
+                'v1rus': 'virus',
+                'v!rus': 'virus',
+                'vlrus': 'virus',
+                'immun3': 'immune',
+                'immun0': 'immune',
+                'lmmune': 'immune',
+                'syst3m': 'system',
+                'syst0m': 'system',
+                'systern': 'system',
+                'h3alth': 'health',
+                'h0alth': 'health',
+                'heaith': 'health',
+                'pat1ent': 'patient',
+                'pat!ent': 'patient',
+                'patlent': 'patient',
+                'hosp1tal': 'hospital',
+                'hosp!tal': 'hospital',
+                'hospltal': 'hospital',
+                'doc-tor': 'doctor',
+                'doct0r': 'doctor',
+                'dcctor': 'doctor',
+                'nurs3': 'nurse',
+                'nurs0': 'nurse',
+                'nurso': 'nurse',
+                'th3': 'the',
+                'th0': 'the',
+                'tho': 'the',
+                'and': 'and',
+                'ond': 'and',
+                'anc': 'and',
+                'w1th': 'with',
+                'w!th': 'with',
+                'wlth': 'with',
+                'fr0m': 'from',
+                'frorn': 'from',
+                'th1s': 'this',
+                'th!s': 'this',
+                'thls': 'this',
+                'that': 'that',
+                'thet': 'that',
+                'thot': 'that',
+                'wh1ch': 'which',
+                'wh!ch': 'which',
+                'whlch': 'which',
+                'caus3': 'cause',
+                'caus0': 'cause',
+                'causo': 'cause',
+                'caus3d': 'caused',
+                'caus0d': 'caused',
+                'causod': 'caused',
+                'sympt0ms': 'symptoms',
+                'symptorns': 'symptoms',
+                'inc1ude': 'include',
+                'inc!ude': 'include',
+                'lnclude': 'include',
+                'inc1udes': 'includes',
+                'inc!udes': 'includes',
+                'lncludes': 'includes',
+                'c0mmon': 'common',
+                'cornmon': 'common',
+                'typ3': 'type',
+                'typ0': 'type',
+                'typo': 'type',
+                'typ3s': 'types',
+                'typ0s': 'types',
+                'typos': 'types',
+                'ar3': 'are',
+                'ar0': 'are',
+                'oro': 'are',
+                'can': 'can',
+                'con': 'can',
+                'cen': 'can',
+                'may': 'may',
+                'moy': 'may',
+                'rnay': 'may',
+                'b3': 'be',
+                'b0': 'be',
+                'bo': 'be',
+                'us3': 'use',
+                'us0': 'use',
+                'uso': 'use',
+                'us3d': 'used',
+                'us0d': 'used',
+                'usod': 'used',
+                'mor3': 'more',
+                'mor0': 'more',
+                'moro': 'more',
+                'oth3r': 'other',
+                'oth0r': 'other',
+                'othor': 'other',
+                'som3': 'some',
+                'som0': 'some',
+                'somo': 'some',
+                'tim3': 'time',
+                'tim0': 'time',
+                'tlme': 'time',
+                'p3ople': 'people',
+                'p0ople': 'people',
+                'poople': 'people',
+                'peopl3': 'people',
+                'peopl0': 'people',
+                'peoplo': 'people'
+            };
+
+            let correctedText = text;
+            
+            // Apply corrections (case-insensitive)
+            for (const [wrong, correct] of Object.entries(corrections)) {
+                const regex = new RegExp('\\b' + wrong + '\\b', 'gi');
+                correctedText = correctedText.replace(regex, (match) => {
+                    // Preserve original case
+                    if (match[0] === match[0].toUpperCase()) {
+                        return correct.charAt(0).toUpperCase() + correct.slice(1);
+                    }
+                    return correct;
+                });
+            }
+            
+            // Fix common number-letter confusions
+            correctedText = correctedText.replace(/\b([a-z]+)1([a-z]+)\b/gi, (match, p1, p2) => p1 + 'i' + p2);
+            correctedText = correctedText.replace(/\b([a-z]+)0([a-z]+)\b/gi, (match, p1, p2) => p1 + 'o' + p2);
+            correctedText = correctedText.replace(/\b([a-z]+)5([a-z]+)\b/gi, (match, p1, p2) => p1 + 's' + p2);
+            correctedText = correctedText.replace(/\b([a-z]+)3([a-z]+)\b/gi, (match, p1, p2) => p1 + 'e' + p2);
+            
+            // Fix spacing issues
+            correctedText = correctedText.replace(/([a-z])([A-Z])/g, '$1 $2'); // Add space between camelCase
+            correctedText = correctedText.replace(/\s+/g, ' '); // Remove multiple spaces
+            correctedText = correctedText.replace(/\s+([.,!?;:])/g, '$1'); // Remove space before punctuation
+            
+            return correctedText;
+        }
+
+        async function performOCR(page, pageNum, totalPages) {
+            const viewport = page.getViewport({ scale: 2.0 });
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            await page.render({
+                canvasContext: context,
+                viewport: viewport
+            }).promise;
+
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+
+            // Perform OCR with Tesseract
+            const result = await Tesseract.recognize(
+                canvas,
+                currentLanguage === 'hi' ? 'hin+eng' : 'eng',
+                {
+                    logger: info => {
+                        if (info.status === 'recognizing text') {
+                            const ocrProgress = Math.round(info.progress * 100);
+                            const totalProgress = 50 + ((pageNum - 1) / totalPages * 50) + (info.progress / totalPages * 50);
+                            progressBar.style.width = `${totalProgress}%`;
+                            progressText.textContent = currentLanguage === 'hi' ? 
+                                `पृष्ठ ${pageNum}/${totalPages} - OCR: ${ocrProgress}%` :
+                                `Page ${pageNum}/${totalPages} - OCR: ${ocrProgress}%`;
+                        }
+                    }
+                }
+            );
+
+            return result.data.text;
+        }
+
+        async function setLanguage(lang) {
+            const previousLanguage = currentLanguage;
+            currentLanguage = lang;
+            
+            const buttons = document.querySelectorAll('.language-toggle button');
+            buttons.forEach(btn => {
+                btn.style.fontWeight = 'normal';
+                btn.style.transform = 'scale(1)';
+            });
+            event.target.style.fontWeight = 'bold';
+            event.target.style.transform = 'scale(1.05)';
+            
+            // Update UI text based on language
+            updateUILanguage();
+            
+            // Update read button text
+            updateReadButton();
+            
+            // If content is already loaded, translate it based on language
+            if (uploadedText && previousLanguage !== lang) {
+                // Store original if not stored
+                if (!originalUploadedText) {
+                    originalUploadedText = uploadedText;
+                }
+                
+                if (lang === 'hi') {
+                    // Translate to Hindi
+                    await translateContentToHindi();
+                } else if (lang === 'hinglish') {
+                    // Translate to Hinglish (Roman Hindi)
+                    await translateContentToHinglish();
+                } else {
+                    // Restore original English
+                    uploadedText = originalUploadedText;
+                    const statusDiv = document.getElementById('loadingStatus');
+                    statusDiv.innerHTML = '✓ Content restored to English';
+                    statusDiv.style.color = '#28a745';
+                }
+                
+                // Re-generate any existing content
+                regenerateExistingContent();
+            }
+        }
+
+        function regenerateExistingContent() {
+            // Check what content was already generated and regenerate it
+            const notesContent = document.getElementById('notesContent').textContent;
+            const mcqContent = document.getElementById('mcqContent').textContent;
+            const writtenContent = document.getElementById('writtenContent').textContent;
+            const flashcardContent = document.getElementById('flashcardContent').innerHTML;
+            
+            // Regenerate notes if they exist
+            if (notesContent && notesContent.trim().length > 50) {
+                generateNotes();
+            }
+            
+            // Regenerate MCQ if it exists
+            if (mcqContent && mcqContent.trim().length > 50) {
+                generateMCQ();
+            }
+            
+            // Regenerate written questions if they exist
+            if (writtenContent && writtenContent.trim().length > 50) {
+                generateWritten();
+            }
+            
+            // Regenerate flashcards if they exist
+            if (flashcardContent && flashcardContent.trim().length > 50) {
+                generateFlashcard();
+            }
+        }
+
+        async function translateContentToHindi() {
+            const statusDiv = document.getElementById('loadingStatus');
+            statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> हिंदी में अनुवाद हो रहा है...';
+            statusDiv.style.color = '#667eea';
+            
+            // Store original text if not already stored
+            if (!originalUploadedText) {
+                originalUploadedText = uploadedText;
+            }
+            
+            try {
+                // Try AI translation first
+                if (API_KEY && API_KEY !== 'YOUR_API_KEY_HERE') {
+                    const translatedText = await translateWithAI(uploadedText);
+                    uploadedText = translatedText;
+                    statusDiv.innerHTML = '✓ सामग्री हिंदी में अनुवादित हो गई!';
+                    statusDiv.style.color = '#28a745';
+                } else {
+                    // Use basic word-by-word translation
+                    uploadedText = translateToHindiBasic(originalUploadedText);
+                    statusDiv.innerHTML = '✓ सामग्री हिंदी में अनुवादित हो गई!';
+                    statusDiv.style.color = '#28a745';
+                }
+                
+            } catch (error) {
+                console.error('Translation error:', error);
+                statusDiv.innerHTML = '⚠️ अनुवाद में त्रुटि - मूल पाठ का उपयोग किया जा रहा है';
+                statusDiv.style.color = '#ffc107';
+            }
+        }
+
+        async function translateContentToHinglish() {
+            const statusDiv = document.getElementById('loadingStatus');
+            statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Hinglish mein convert ho raha hai...';
+            statusDiv.style.color = '#667eea';
+            
+            // Store original text if not already stored
+            if (!originalUploadedText) {
+                originalUploadedText = uploadedText;
+            }
+            
+            try {
+                // First translate to Hindi, then transliterate to Roman
+                const hindiText = translateToHindiBasic(originalUploadedText);
+                uploadedText = transliterateToRoman(hindiText);
+                
+                statusDiv.innerHTML = '✓ Content Hinglish mein convert ho gaya!';
+                statusDiv.style.color = '#28a745';
+                
+            } catch (error) {
+                console.error('Hinglish conversion error:', error);
+                statusDiv.innerHTML = '⚠️ Conversion mein error - original text use ho raha hai';
+                statusDiv.style.color = '#ffc107';
+            }
+        }
+
+        function transliterateToRoman(hindiText) {
+            // Hindi to Roman transliteration map
+            const transliterationMap = {
+                // Vowels
+                'अ': 'a', 'आ': 'aa', 'इ': 'i', 'ई': 'ee', 'उ': 'u', 'ऊ': 'oo',
+                'ऋ': 'ri', 'ए': 'e', 'ऐ': 'ai', 'ओ': 'o', 'औ': 'au',
+                
+                // Consonants
+                'क': 'k', 'ख': 'kh', 'ग': 'g', 'घ': 'gh', 'ङ': 'ng',
+                'च': 'ch', 'छ': 'chh', 'ज': 'j', 'झ': 'jh', 'ञ': 'ny',
+                'ट': 't', 'ठ': 'th', 'ड': 'd', 'ढ': 'dh', 'ण': 'n',
+                'त': 't', 'थ': 'th', 'द': 'd', 'ध': 'dh', 'न': 'n',
+                'प': 'p', 'फ': 'ph', 'ब': 'b', 'भ': 'bh', 'म': 'm',
+                'य': 'y', 'र': 'r', 'ल': 'l', 'व': 'v', 'श': 'sh',
+                'ष': 'sh', 'स': 's', 'ह': 'h', 'क्ष': 'ksh', 'त्र': 'tr',
+                'ज्ञ': 'gya',
+                
+                // Vowel signs (matras)
+                'ा': 'aa', 'ि': 'i', 'ी': 'ee', 'ु': 'u', 'ू': 'oo',
+                'ृ': 'ri', 'े': 'e', 'ै': 'ai', 'ो': 'o', 'ौ': 'au',
+                '्': '', // Halant (virama)
+                'ं': 'n', 'ः': 'h', 'ँ': 'n',
+                
+                // Common words (for better readability)
+                'अध्ययन': 'adhyayan',
+                'सामग्री': 'samagri',
+                'नोट्स': 'notes',
+                'क्विज़': 'quiz',
+                'फ्लैशकार्ड': 'flashcard',
+                'प्रश्न': 'prashna',
+                'उत्तर': 'uttar',
+                'महत्वपूर्ण': 'mahatvapurn',
+                'सामान्य': 'samanya',
+                'विशेष': 'vishesh',
+                'मुख्य': 'mukhya',
+                'प्रकाश': 'prakash',
+                'संश्लेषण': 'sanshleshan',
+                'प्रक्रिया': 'prakriya',
+                'पौधा': 'paudha',
+                'पौधे': 'paudhe',
+                'पत्ती': 'patti',
+                'पत्तियां': 'pattiyan',
+                'ऑक्सीजन': 'oxygen',
+                'कार्बन': 'carbon',
+                'डाइऑक्साइड': 'dioxide',
+                'ग्लूकोज': 'glucose',
+                'ऊर्जा': 'urja',
+                'सूर्य': 'surya',
+                'मच्छर': 'machchhar',
+                'रोग': 'rog',
+                'मलेरिया': 'malaria',
+                'बुखार': 'bukhar',
+                'लक्षण': 'lakshan',
+                'उपचार': 'upchar',
+                'दवा': 'dawa',
+                'दवाएं': 'dawayen',
+                'रोगी': 'rogi',
+                'डॉक्टर': 'doctor',
+                'अस्पताल': 'aspatal',
+                'संक्रमण': 'sankraman',
+                'परजीवी': 'parjeevi',
+                'रक्त': 'rakt',
+                'कोशिका': 'koshika',
+                'कोशिकाएं': 'koshikayen',
+                'स्वास्थ्य': 'swasthya',
+                'रोकथाम': 'roktham',
+                'कारण': 'karan',
+                'संचारित': 'sancharit',
+                'संचरण': 'sancharan',
+                'वायरस': 'virus',
+                'बैक्टीरिया': 'bacteria',
+                'प्रोटीन': 'protein',
+                'प्रतिरक्षा': 'pratiraksha',
+                'प्रणाली': 'pranali',
+                'प्रणालियां': 'pranaliyan',
+                'है': 'hai',
+                'हैं': 'hain',
+                'था': 'tha',
+                'थे': 'the',
+                'और': 'aur',
+                'या': 'ya',
+                'लेकिन': 'lekin',
+                'के साथ': 'ke saath',
+                'से': 'se',
+                'को': 'ko',
+                'में': 'mein',
+                'पर': 'par',
+                'द्वारा': 'dwara',
+                'के लिए': 'ke liye',
+                'का': 'ka',
+                'यह': 'yeh',
+                'वह': 'vah',
+                'ये': 'ye',
+                'वे': 've',
+                'एक': 'ek',
+                'सकता': 'sakta',
+                'होगा': 'hoga',
+                'चाहिए': 'chahiye',
+                'जरूर': 'zaroor',
+                'करना': 'karna',
+                'करता': 'karta',
+                'किया': 'kiya',
+                'बनाना': 'banana',
+                'बनाया': 'banaya',
+                'उपयोग': 'upyog',
+                'लोग': 'log',
+                'व्यक्ति': 'vyakti',
+                'समय': 'samay',
+                'वर्ष': 'varsh',
+                'दिन': 'din',
+                'तरीका': 'tarika',
+                'चीज': 'cheez',
+                'चीजें': 'cheezen',
+                'आदमी': 'aadmi',
+                'महिला': 'mahila',
+                'बच्चा': 'bachcha',
+                'बच्चे': 'bachche',
+                'जीवन': 'jeevan',
+                'काम': 'kaam',
+                'दुनिया': 'duniya',
+                'पानी': 'paani',
+                'भोजन': 'bhojan',
+                'शरीर': 'sharir',
+                'अलग': 'alag',
+                'समान': 'saman',
+                'अन्य': 'anya',
+                'कई': 'kai',
+                'कुछ': 'kuch',
+                'सभी': 'sabhi',
+                'अधिक': 'adhik',
+                'बहुत': 'bahut',
+                'भी': 'bhi',
+                'केवल': 'keval',
+                'पहला': 'pehla',
+                'अंतिम': 'antim',
+                'अच्छा': 'achha',
+                'बुरा': 'bura',
+                'नया': 'naya',
+                'पुराना': 'purana',
+                'उच्च': 'uchch',
+                'निम्न': 'nimn',
+                'बड़ा': 'bada',
+                'छोटा': 'chhota'
+            };
+
+            let romanText = hindiText;
+            
+            // Sort by length (longest first) for better matching
+            const sortedEntries = Object.entries(transliterationMap).sort((a, b) => b[0].length - a[0].length);
+            
+            // Replace Hindi with Roman
+            for (const [hindi, roman] of sortedEntries) {
+                const regex = new RegExp(hindi.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+                romanText = romanText.replace(regex, roman);
+            }
+            
+            return romanText;
+        }
+
+        async function translateWithAI(text) {
+            const prompt = `Translate the following text to Hindi. Maintain the structure and formatting:\n\n${text}`;
+            
+            const response = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: [{
+                        role: 'user',
+                        content: prompt
+                    }],
+                    temperature: 0.3
+                })
+            });
+
+            if (!response.ok) throw new Error('Translation API failed');
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        function translateToHindiBasic(text) {
+            // Comprehensive English to Hindi translation dictionary
+            const dictionary = {
+                // Medical/Scientific terms
+                'photosynthesis': 'प्रकाश संश्लेषण',
+                'chlorophyll': 'क्लोरोफिल',
+                'chloroplast': 'क्लोरोप्लास्ट',
+                'chloroplasts': 'क्लोरोप्लास्ट',
+                'oxygen': 'ऑक्सीजन',
+                'carbon dioxide': 'कार्बन डाइऑक्साइड',
+                'glucose': 'ग्लूकोज',
+                'energy': 'ऊर्जा',
+                'sunlight': 'सूर्य का प्रकाश',
+                'light': 'प्रकाश',
+                'plant': 'पौधा',
+                'plants': 'पौधे',
+                'leaf': 'पत्ती',
+                'leaves': 'पत्तियां',
+                'root': 'जड़',
+                'roots': 'जड़ें',
+                'stem': 'तना',
+                'flower': 'फूल',
+                'flowers': 'फूल',
+                'mosquito': 'मच्छर',
+                'mosquitoes': 'मच्छर',
+                'disease': 'रोग',
+                'diseases': 'रोग',
+                'malaria': 'मलेरिया',
+                'fever': 'बुखार',
+                'symptom': 'लक्षण',
+                'symptoms': 'लक्षण',
+                'treatment': 'उपचार',
+                'medicine': 'दवा',
+                'medicines': 'दवाएं',
+                'patient': 'रोगी',
+                'patients': 'रोगी',
+                'doctor': 'डॉक्टर',
+                'doctors': 'डॉक्टर',
+                'nurse': 'नर्स',
+                'nurses': 'नर्स',
+                'hospital': 'अस्पताल',
+                'hospitals': 'अस्पताल',
+                'infection': 'संक्रमण',
+                'infections': 'संक्रमण',
+                'parasite': 'परजीवी',
+                'parasites': 'परजीवी',
+                'blood': 'रक्त',
+                'cell': 'कोशिका',
+                'cells': 'कोशिकाएं',
+                'health': 'स्वास्थ्य',
+                'healthy': 'स्वस्थ',
+                'prevention': 'रोकथाम',
+                'prevent': 'रोकना',
+                'cause': 'कारण',
+                'causes': 'कारण',
+                'caused': 'कारण बना',
+                'transmit': 'संचारित करना',
+                'transmitted': 'संचारित',
+                'transmission': 'संचरण',
+                'virus': 'वायरस',
+                'viruses': 'वायरस',
+                'bacteria': 'बैक्टीरिया',
+                'protein': 'प्रोटीन',
+                'proteins': 'प्रोटीन',
+                'immune': 'प्रतिरक्षा',
+                'immunity': 'प्रतिरक्षा',
+                'system': 'प्रणाली',
+                'systems': 'प्रणालियां',
+                'organ': 'अंग',
+                'organs': 'अंग',
+                'tissue': 'ऊतक',
+                'tissues': 'ऊतक',
+                'molecule': 'अणु',
+                'molecules': 'अणु',
+                'atom': 'परमाणु',
+                'atoms': 'परमाणु',
+                'chemical': 'रासायनिक',
+                'reaction': 'प्रतिक्रिया',
+                'reactions': 'प्रतिक्रियाएं',
+                'process': 'प्रक्रिया',
+                'processes': 'प्रक्रियाएं',
+                'function': 'कार्य',
+                'functions': 'कार्य',
+                'structure': 'संरचना',
+                'structures': 'संरचनाएं',
+                'temperature': 'तापमान',
+                'water': 'पानी',
+                'food': 'भोजन',
+                'nutrient': 'पोषक तत्व',
+                'nutrients': 'पोषक तत्व',
+                'vitamin': 'विटामिन',
+                'vitamins': 'विटामिन',
+                'mineral': 'खनिज',
+                'minerals': 'खनिज',
+                
+                // Action verbs
+                'occurs': 'होता है',
+                'occur': 'होना',
+                'happening': 'हो रहा है',
+                'happened': 'हुआ',
+                'produce': 'उत्पन्न करना',
+                'produces': 'उत्पन्न करता है',
+                'produced': 'उत्पन्न किया',
+                'production': 'उत्पादन',
+                'create': 'बनाना',
+                'creates': 'बनाता है',
+                'created': 'बनाया',
+                'creation': 'निर्माण',
+                'contain': 'शामिल करना',
+                'contains': 'शामिल है',
+                'contained': 'शामिल था',
+                'require': 'आवश्यकता होना',
+                'requires': 'आवश्यकता है',
+                'required': 'आवश्यक',
+                'need': 'जरूरत',
+                'needs': 'जरूरत है',
+                'needed': 'जरूरत थी',
+                'help': 'मदद करना',
+                'helps': 'मदद करता है',
+                'helped': 'मदद की',
+                'provide': 'प्रदान करना',
+                'provides': 'प्रदान करता है',
+                'provided': 'प्रदान किया',
+                'allow': 'अनुमति देना',
+                'allows': 'अनुमति देता है',
+                'allowed': 'अनुमति दी',
+                'enable': 'सक्षम करना',
+                'enables': 'सक्षम करता है',
+                'enabled': 'सक्षम किया',
+                'affect': 'प्रभावित करना',
+                'affects': 'प्रभावित करता है',
+                'affected': 'प्रभावित',
+                'increase': 'बढ़ाना',
+                'increases': 'बढ़ाता है',
+                'increased': 'बढ़ाया',
+                'decrease': 'घटाना',
+                'decreases': 'घटाता है',
+                'decreased': 'घटाया',
+                'develop': 'विकसित करना',
+                'develops': 'विकसित करता है',
+                'developed': 'विकसित',
+                'development': 'विकास',
+                
+                // Common words
+                'introduction': 'परिचय',
+                'conclusion': 'निष्कर्ष',
+                'important': 'महत्वपूर्ण',
+                'importance': 'महत्व',
+                'essential': 'आवश्यक',
+                'necessary': 'जरूरी',
+                'fundamental': 'मौलिक',
+                'basic': 'बुनियादी',
+                'primary': 'प्राथमिक',
+                'main': 'मुख्य',
+                'major': 'प्रमुख',
+                'minor': 'छोटा',
+                'common': 'सामान्य',
+                'rare': 'दुर्लभ',
+                'different': 'अलग',
+                'difference': 'अंतर',
+                'similar': 'समान',
+                'similarity': 'समानता',
+                'same': 'समान',
+                'other': 'अन्य',
+                'another': 'दूसरा',
+                'several': 'कई',
+                'various': 'विभिन्न',
+                'many': 'कई',
+                'some': 'कुछ',
+                'few': 'कुछ',
+                'all': 'सभी',
+                'every': 'प्रत्येक',
+                'each': 'हर',
+                'both': 'दोनों',
+                'either': 'या तो',
+                'neither': 'न ही',
+                'more': 'अधिक',
+                'most': 'सबसे अधिक',
+                'less': 'कम',
+                'least': 'सबसे कम',
+                'much': 'बहुत',
+                'very': 'बहुत',
+                'too': 'भी',
+                'also': 'भी',
+                'only': 'केवल',
+                'just': 'बस',
+                'even': 'यहां तक कि',
+                'still': 'अभी भी',
+                'yet': 'अभी तक',
+                'already': 'पहले से',
+                'always': 'हमेशा',
+                'never': 'कभी नहीं',
+                'sometimes': 'कभी-कभी',
+                'often': 'अक्सर',
+                'usually': 'आमतौर पर',
+                'generally': 'आम तौर पर',
+                'specifically': 'विशेष रूप से',
+                'particularly': 'खास तौर पर',
+                'especially': 'विशेष रूप से',
+                
+                // Connecting words
+                'the': '',
+                'a': 'एक',
+                'an': 'एक',
+                'is': 'है',
+                'are': 'हैं',
+                'was': 'था',
+                'were': 'थे',
+                'be': 'होना',
+                'been': 'रहा है',
+                'being': 'होना',
+                'have': 'है',
+                'has': 'है',
+                'had': 'था',
+                'having': 'होना',
+                'do': 'करना',
+                'does': 'करता है',
+                'did': 'किया',
+                'doing': 'कर रहा है',
+                'done': 'किया गया',
+                'will': 'होगा',
+                'would': 'होगा',
+                'should': 'चाहिए',
+                'could': 'सकता है',
+                'can': 'सकता है',
+                'may': 'हो सकता है',
+                'might': 'हो सकता है',
+                'must': 'जरूर',
+                'shall': 'होगा',
+                'and': 'और',
+                'or': 'या',
+                'but': 'लेकिन',
+                'because': 'क्योंकि',
+                'if': 'अगर',
+                'when': 'जब',
+                'where': 'जहां',
+                'which': 'जो',
+                'who': 'कौन',
+                'what': 'क्या',
+                'how': 'कैसे',
+                'why': 'क्यों',
+                'with': 'के साथ',
+                'without': 'बिना',
+                'from': 'से',
+                'to': 'को',
+                'into': 'में',
+                'in': 'में',
+                'on': 'पर',
+                'at': 'पर',
+                'by': 'द्वारा',
+                'for': 'के लिए',
+                'of': 'का',
+                'about': 'के बारे में',
+                'as': 'के रूप में',
+                'like': 'जैसे',
+                'through': 'के माध्यम से',
+                'during': 'के दौरान',
+                'before': 'पहले',
+                'after': 'बाद में',
+                'above': 'ऊपर',
+                'below': 'नीचे',
+                'between': 'बीच में',
+                'among': 'के बीच',
+                'under': 'के तहत',
+                'over': 'के ऊपर',
+                'up': 'ऊपर',
+                'down': 'नीचे',
+                'out': 'बाहर',
+                'off': 'बंद',
+                'than': 'से',
+                'then': 'फिर',
+                'now': 'अब',
+                'here': 'यहां',
+                'there': 'वहां',
+                
+                // Nouns
+                'this': 'यह',
+                'that': 'वह',
+                'these': 'ये',
+                'those': 'वे',
+                'it': 'यह',
+                'they': 'वे',
+                'them': 'उन्हें',
+                'their': 'उनका',
+                'its': 'इसका',
+                'people': 'लोग',
+                'person': 'व्यक्ति',
+                'man': 'आदमी',
+                'men': 'आदमी',
+                'woman': 'महिला',
+                'women': 'महिलाएं',
+                'child': 'बच्चा',
+                'children': 'बच्चे',
+                'life': 'जीवन',
+                'lives': 'जीवन',
+                'work': 'काम',
+                'works': 'काम करता है',
+                'worked': 'काम किया',
+                'working': 'काम कर रहा है',
+                'world': 'दुनिया',
+                'year': 'वर्ष',
+                'years': 'वर्ष',
+                'day': 'दिन',
+                'days': 'दिन',
+                'time': 'समय',
+                'times': 'बार',
+                'way': 'तरीका',
+                'ways': 'तरीके',
+                'thing': 'चीज',
+                'things': 'चीजें',
+                'place': 'जगह',
+                'places': 'जगहें',
+                'part': 'भाग',
+                'parts': 'भाग',
+                'number': 'संख्या',
+                'numbers': 'संख्याएं',
+                'area': 'क्षेत्र',
+                'areas': 'क्षेत्र',
+                'level': 'स्तर',
+                'levels': 'स्तर',
+                'type': 'प्रकार',
+                'types': 'प्रकार',
+                'kind': 'प्रकार',
+                'kinds': 'प्रकार',
+                'form': 'रूप',
+                'forms': 'रूप',
+                'example': 'उदाहरण',
+                'examples': 'उदाहरण',
+                'result': 'परिणाम',
+                'results': 'परिणाम',
+                'effect': 'प्रभाव',
+                'effects': 'प्रभाव',
+                'factor': 'कारक',
+                'factors': 'कारक',
+                'reason': 'कारण',
+                'reasons': 'कारण',
+                'problem': 'समस्या',
+                'problems': 'समस्याएं',
+                'solution': 'समाधान',
+                'solutions': 'समाधान',
+                'question': 'प्रश्न',
+                'questions': 'प्रश्न',
+                'answer': 'उत्तर',
+                'answers': 'उत्तर',
+                'information': 'जानकारी',
+                'data': 'डेटा',
+                'study': 'अध्ययन',
+                'studies': 'अध्ययन',
+                'research': 'अनुसंधान',
+                'method': 'विधि',
+                'methods': 'विधियां',
+                
+                // Adjectives
+                'first': 'पहला',
+                'second': 'दूसरा',
+                'third': 'तीसरा',
+                'last': 'अंतिम',
+                'next': 'अगला',
+                'previous': 'पिछला',
+                'new': 'नया',
+                'old': 'पुराना',
+                'young': 'युवा',
+                'good': 'अच्छा',
+                'better': 'बेहतर',
+                'best': 'सबसे अच्छा',
+                'bad': 'बुरा',
+                'worse': 'बदतर',
+                'worst': 'सबसे बुरा',
+                'great': 'महान',
+                'small': 'छोटा',
+                'large': 'बड़ा',
+                'big': 'बड़ा',
+                'little': 'छोटा',
+                'long': 'लंबा',
+                'short': 'छोटा',
+                'high': 'उच्च',
+                'low': 'निम्न',
+                'early': 'जल्दी',
+                'late': 'देर से',
+                'fast': 'तेज',
+                'slow': 'धीमा',
+                'quick': 'त्वरित',
+                'easy': 'आसान',
+                'hard': 'कठिन',
+                'difficult': 'कठिन',
+                'simple': 'सरल',
+                'complex': 'जटिल',
+                'clear': 'स्पष्ट',
+                'dark': 'अंधेरा',
+                'light': 'हल्का',
+                'heavy': 'भारी',
+                'strong': 'मजबूत',
+                'weak': 'कमजोर',
+                'full': 'पूर्ण',
+                'empty': 'खाली',
+                'complete': 'पूर्ण',
+                'incomplete': 'अपूर्ण',
+                'possible': 'संभव',
+                'impossible': 'असंभव',
+                'true': 'सच',
+                'false': 'झूठ',
+                'right': 'सही',
+                'wrong': 'गलत',
+                'correct': 'सही',
+                'incorrect': 'गलत',
+                'positive': 'सकारात्मक',
+                'negative': 'नकारात्मक',
+                'active': 'सक्रिय',
+                'inactive': 'निष्क्रिय',
+                'alive': 'जीवित',
+                'dead': 'मृत',
+                'natural': 'प्राकृतिक',
+                'artificial': 'कृत्रिम'
+            };
+
+            let translatedText = text;
+            
+            // Sort by length (longest first) to handle phrases before individual words
+            const sortedEntries = Object.entries(dictionary).sort((a, b) => b[0].length - a[0].length);
+            
+            // Replace words and phrases (case-insensitive)
+            for (const [english, hindi] of sortedEntries) {
+                if (hindi) { // Skip empty translations
+                    const regex = new RegExp('\\b' + english.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+                    translatedText = translatedText.replace(regex, hindi);
+                }
+            }
+            
+            // Clean up extra spaces
+            translatedText = translatedText.replace(/\s+/g, ' ').trim();
+            
+            return translatedText;
+        }
+
+        function updateUILanguage() {
+            if (currentLanguage === 'hi') {
+                // Update all UI elements to Hindi
+                document.querySelector('header h1').innerHTML = '<i class="fas fa-graduation-cap"></i> ट्यूटर AI';
+                document.querySelector('header p').textContent = 'अपनी अध्ययन सामग्री अपलोड करें और हिंदी और अंग्रेजी में स्पष्टीकरण, नोट्स, क्विज़ और फ्लैशकार्ड प्राप्त करें!';
+                
+                document.querySelector('.upload-section h2').innerHTML = '<i class="fas fa-upload"></i> अध्ययन सामग्री अपलोड करें';
+                document.querySelector('.upload-section button').innerHTML = '<i class="fas fa-file-import"></i> फ़ाइल लोड करें';
+                
+                document.querySelector('.notes h3').innerHTML = '<i class="fas fa-book"></i> नोट्स';
+                document.querySelectorAll('.notes button')[0].innerHTML = '<i class="fas fa-magic"></i> नोट्स बनाएं';
+                document.querySelectorAll('.notes button')[1].innerHTML = '<i class="fas fa-copy"></i> कॉपी करें';
+                document.querySelectorAll('.notes button')[2].innerHTML = '<i class="fas fa-download"></i> डाउनलोड करें';
+                
+                document.querySelector('.quiz h3').innerHTML = '<i class="fas fa-question-circle"></i> क्विज़';
+                document.querySelectorAll('.quiz button')[0].innerHTML = '<i class="fas fa-list-check"></i> MCQ बनाएं';
+                document.querySelectorAll('.quiz button')[1].innerHTML = '<i class="fas fa-pen"></i> लिखित प्रश्न बनाएं';
+                
+                document.querySelector('.flashcards h3').innerHTML = '<i class="fas fa-layer-group"></i> फ्लैशकार्ड';
+                document.querySelector('.flashcards button').innerHTML = '<i class="fas fa-cards-blank"></i> फ्लैशकार्ड बनाएं';
+                
+                document.querySelector('.chat h3').innerHTML = '<i class="fas fa-comments"></i> कभी भी प्रश्न पूछें';
+                document.getElementById('chatInput').placeholder = 'एक प्रश्न पूछें...';
+                document.querySelector('.chat button').innerHTML = '<i class="fas fa-paper-plane"></i> भेजें';
+                
+            } else if (currentLanguage === 'hinglish') {
+                // Update all UI elements to Hinglish (Natural mix of English and Hindi)
+                document.querySelector('header h1').innerHTML = '<i class="fas fa-graduation-cap"></i> Tutor AI';
+                document.querySelector('header p').textContent = 'Apni study material upload karo aur Hindi aur English mein notes, quizzes, aur flashcards pao!';
+                
+                document.querySelector('.upload-section h2').innerHTML = '<i class="fas fa-upload"></i> Study Material Upload Karo';
+                document.querySelector('.upload-section button').innerHTML = '<i class="fas fa-file-import"></i> File Load Karo';
+                
+                document.querySelector('.notes h3').innerHTML = '<i class="fas fa-book"></i> Notes';
+                document.querySelectorAll('.notes button')[0].innerHTML = '<i class="fas fa-magic"></i> Notes Banao';
+                document.querySelectorAll('.notes button')[1].innerHTML = '<i class="fas fa-copy"></i> Copy Karo';
+                document.querySelectorAll('.notes button')[2].innerHTML = '<i class="fas fa-download"></i> Download Karo';
+                
+                document.querySelector('.quiz h3').innerHTML = '<i class="fas fa-question-circle"></i> Quiz';
+                document.querySelectorAll('.quiz button')[0].innerHTML = '<i class="fas fa-list-check"></i> MCQ Banao';
+                document.querySelectorAll('.quiz button')[1].innerHTML = '<i class="fas fa-pen"></i> Written Questions Banao';
+                
+                document.querySelector('.flashcards h3').innerHTML = '<i class="fas fa-layer-group"></i> Flashcards';
+                document.querySelector('.flashcards button').innerHTML = '<i class="fas fa-cards-blank"></i> Flashcards Banao';
+                
+                document.querySelector('.chat h3').innerHTML = '<i class="fas fa-comments"></i> Koi Bhi Sawal Pucho';
+                document.getElementById('chatInput').placeholder = 'Apna sawal pucho...';
+                document.querySelector('.chat button').innerHTML = '<i class="fas fa-paper-plane"></i> Bhejo';
+                
+            } else {
+                // Update all UI elements to English
+                document.querySelector('header h1').innerHTML = '<i class="fas fa-graduation-cap"></i> Tutor AI';
+                document.querySelector('header p').textContent = 'Upload your study material and get explanations, notes, quizzes, and flashcards in Hindi and English!';
+                
+                document.querySelector('.upload-section h2').innerHTML = '<i class="fas fa-upload"></i> Upload Study Material';
+                document.querySelector('.upload-section button').innerHTML = '<i class="fas fa-file-import"></i> Load File';
+                
+                document.querySelector('.notes h3').innerHTML = '<i class="fas fa-book"></i> Notes';
+                document.querySelectorAll('.notes button')[0].innerHTML = '<i class="fas fa-magic"></i> Generate Notes';
+                document.querySelectorAll('.notes button')[1].innerHTML = '<i class="fas fa-copy"></i> Copy';
+                document.querySelectorAll('.notes button')[2].innerHTML = '<i class="fas fa-download"></i> Download';
+                
+                document.querySelector('.quiz h3').innerHTML = '<i class="fas fa-question-circle"></i> Quiz';
+                document.querySelectorAll('.quiz button')[0].innerHTML = '<i class="fas fa-list-check"></i> Generate MCQ';
+                document.querySelectorAll('.quiz button')[1].innerHTML = '<i class="fas fa-pen"></i> Generate Written Question';
+                
+                document.querySelector('.flashcards h3').innerHTML = '<i class="fas fa-layer-group"></i> Flashcards';
+                document.querySelector('.flashcards button').innerHTML = '<i class="fas fa-cards-blank"></i> Generate Flashcard';
+                
+                document.querySelector('.chat h3').innerHTML = '<i class="fas fa-comments"></i> Ask Questions Anytime';
+                document.getElementById('chatInput').placeholder = 'Ask a question...';
+                document.querySelector('.chat button').innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+            }
+        }
+
+        function explainContent() {
+            const explanation = currentLanguage === 'hi' ? 
+                '<span lang="hi-IN">फ़ाइल सफलतापूर्वक लोड हो गई! अब आप नोट्स, क्विज़ और फ्लैशकार्ड बना सकते हैं।</span>' : 
+                'File loaded successfully! You can now generate notes, quizzes, and flashcards.';
+            document.getElementById('notesContent').innerHTML = `<p>${explanation}</p>`;
+        }
+
+        async function callAI(prompt) {
+            // This is a template for AI API integration
+            // Replace with actual API call to OpenAI, Gemini, Claude, etc.
+            
+            // Check if API key is configured
+            if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE') {
+                throw new Error('API key not configured');
+            }
+            
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [{
+                            role: 'user',
+                            content: prompt
+                        }],
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+
+                const data = await response.json();
+                return data.choices[0].message.content;
+            } catch (error) {
+                console.error('AI API Error:', error);
+                throw error; // Re-throw to trigger fallback
+            }
+        }
+
+        function generateLocalResponse(prompt) {
+            // This function is no longer used - each feature has its own local generator
+            return 'Local processing error';
+        }
+
+        function extractKeyPoints(text) {
+            // Extract key sentences and create structured notes
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 20);
+            const paragraphs = text.split(/\n\n+/);
+            
+            let notes = currentLanguage === 'hi' ? 
+                '� विस्तृत अध्ययन नोट्स\n' + '='.repeat(50) + '\n\n' : 
+                '� DETAILED STUDY NOTES\n' + '='.repeat(50) + '\n\n';
+            
+            // Extract headings and important points
+            let sectionNumber = 1;
+            paragraphs.forEach((para, idx) => {
+                const lines = para.trim().split('\n');
+                const firstLine = lines[0];
+                
+                if (firstLine && firstLine.length < 100 && firstLine.length > 5) {
+                    // This looks like a heading
+                    notes += `\n${sectionNumber}. ${firstLine.toUpperCase()}\n`;
+                    notes += '-'.repeat(50) + '\n\n';
+                    sectionNumber++;
+                    
+                    // Get content from this paragraph
+                    const paraSentences = para.split(/[.!?]+/).filter(s => s.trim().length > 30);
+                    paraSentences.forEach((s, i) => {
+                        const trimmed = s.trim();
+                        if (trimmed.length > 0 && trimmed !== firstLine) {
+                            notes += `   • ${trimmed}.\n\n`;
+                        }
+                    });
+                } else {
+                    // Regular paragraph
+                    const paraSentences = para.split(/[.!?]+/).filter(s => s.trim().length > 30);
+                    paraSentences.forEach((s, i) => {
+                        const trimmed = s.trim();
+                        if (trimmed.length > 0) {
+                            notes += `   • ${trimmed}.\n\n`;
+                        }
+                    });
+                }
+            });
+            
+            // Add summary section
+            notes += '\n' + '='.repeat(50) + '\n';
+            notes += currentLanguage === 'hi' ? 
+                '📋 मुख्य बिंदु सारांश\n' :
+                currentLanguage === 'hinglish' ?
+                '📋 IMPORTANT POINTS SUMMARY\n' :
+                '📋 KEY POINTS SUMMARY\n';
+            notes += '='.repeat(50) + '\n\n';
+            
+            const importantSentences = sentences
+                .filter(s => s.length > 40)
+                .slice(0, 5);
+            
+            importantSentences.forEach((s, i) => {
+                notes += `${i + 1}. ${s.trim()}.\n\n`;
+            });
+            
+            // Add footer
+            notes += '\n' + '='.repeat(50) + '\n';
+            notes += currentLanguage === 'hi' ? 
+                '✨ नोट्स समाप्त ✨' :
+                currentLanguage === 'hinglish' ?
+                '✨ NOTES KHATAM ✨' :
+                '✨ END OF NOTES ✨';
+            
+            return notes;
+        }
+
+        function copyNotes() {
+            const notesContent = document.getElementById('notesContent').textContent;
+            if (!notesContent || notesContent.trim().length === 0 || notesContent.trim().length < 20) {
+                const msg = currentLanguage === 'hi' ? 
+                    'पहले नोट्स बनाएं!' : 
+                    currentLanguage === 'hinglish' ?
+                    'Pehle notes banao!' :
+                    'Generate notes first!';
+                alert(msg);
+                return;
+            }
+            
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(notesContent).then(() => {
+                    const msg = currentLanguage === 'hi' ? 
+                        '✓ नोट्स कॉपी हो गए!' : 
+                        currentLanguage === 'hinglish' ?
+                        '✓ Notes copy ho gaye!' :
+                        '✓ Notes copied to clipboard!';
+                    alert(msg);
+                }).catch(err => {
+                    console.error('Copy failed:', err);
+                    // Fallback to older method
+                    copyToClipboardFallback(notesContent);
+                });
+            } else {
+                // Fallback for older browsers
+                copyToClipboardFallback(notesContent);
+            }
+        }
+
+        function copyToClipboardFallback(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                const msg = successful ? 
+                    (currentLanguage === 'hi' ? '✓ नोट्स कॉपी हो गए!' : 
+                     currentLanguage === 'hinglish' ? '✓ Notes copy ho gaye!' :
+                     '✓ Notes copied to clipboard!') :
+                    (currentLanguage === 'hi' ? 'कॉपी करने में त्रुटि' :
+                     currentLanguage === 'hinglish' ? 'Copy karne mein error' :
+                     'Failed to copy');
+                alert(msg);
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                const msg = currentLanguage === 'hi' ? 
+                    'कॉपी करने में त्रुटि। कृपया मैन्युअल रूप से कॉपी करें।' :
+                    currentLanguage === 'hinglish' ?
+                    'Copy karne mein error. Please manually copy karein.' :
+                    'Failed to copy. Please copy manually.';
+                alert(msg);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function downloadNotes() {
+            const notesContent = document.getElementById('notesContent').textContent;
+            if (!notesContent || notesContent.trim().length === 0 || notesContent.trim().length < 20) {
+                const msg = currentLanguage === 'hi' ? 
+                    'पहले नोट्स बनाएं!' : 
+                    currentLanguage === 'hinglish' ?
+                    'Pehle notes banao!' :
+                    'Generate notes first!';
+                alert(msg);
+                return;
+            }
+            
+            try {
+                // Create blob with UTF-8 encoding to support Hindi characters
+                const blob = new Blob([notesContent], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                // Generate filename based on language
+                const timestamp = new Date().toISOString().slice(0, 10);
+                if (currentLanguage === 'hi') {
+                    a.download = `study-notes-hindi-${timestamp}.txt`;
+                } else if (currentLanguage === 'hinglish') {
+                    a.download = `study-notes-hinglish-${timestamp}.txt`;
+                } else {
+                    a.download = `study-notes-${timestamp}.txt`;
+                }
+                
+                // Trigger download
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                const msg = currentLanguage === 'hi' ? 
+                    '✓ नोट्स डाउनलोड हो गए!' : 
+                    currentLanguage === 'hinglish' ?
+                    '✓ Notes download ho gaye!' :
+                    '✓ Notes downloaded!';
+                
+                setTimeout(() => alert(msg), 200);
+            } catch (err) {
+                console.error('Download failed:', err);
+                const msg = currentLanguage === 'hi' ? 
+                    'डाउनलोड करने में त्रुटि' :
+                    currentLanguage === 'hinglish' ?
+                    'Download karne mein error' :
+                    'Failed to download';
+                alert(msg);
+            }
+        }
+
+        function toggleReadNotes() {
+            if (isReading) {
+                stopReading();
+            } else {
+                startReading();
+            }
+        }
+
+        function startReading() {
+            const notesContent = document.getElementById('notesContent').textContent;
+            if (!notesContent || notesContent.trim().length === 0 || notesContent.trim().length < 20) {
+                const msg = currentLanguage === 'hi' ? 
+                    'पहले नोट्स बनाएं!' : 
+                    currentLanguage === 'hinglish' ?
+                    'Pehle notes banao!' :
+                    'Generate notes first!';
+                alert(msg);
+                return;
+            }
+
+            // Clean text by removing symbols
+            const cleanedText = cleanTextForSpeech(notesContent);
+
+            // Use Leo TTS for all languages (English, Hindi, Hinglish)
+            if (LEO_TTS_API_KEY !== 'YOUR_LEO_API_KEY_HERE') {
+                startLeoTTS(cleanedText);
+            } else {
+                startBrowserTTS(cleanedText);
+            }
+        }
+
+        function cleanTextForSpeech(text) {
+            // Remove special symbols and formatting characters
+            let cleaned = text;
+            
+            // Remove common symbols but keep basic punctuation
+            cleaned = cleaned.replace(/[?★●○•◆■□▪▫]/g, ''); // Remove decorative symbols
+            cleaned = cleaned.replace(/[=\-_]{3,}/g, ''); // Remove separator lines (===, ---, ___)
+            cleaned = cleaned.replace(/[#*]/g, ''); // Remove markdown symbols
+            cleaned = cleaned.replace(/[\[\]{}]/g, ''); // Remove brackets
+            cleaned = cleaned.replace(/[|\\\/]/g, ''); // Remove pipes and slashes
+            cleaned = cleaned.replace(/[@$%^&+<>~`]/g, ''); // Remove special characters
+            cleaned = cleaned.replace(/\d+\./g, ''); // Remove numbered list markers (1., 2., etc)
+            cleaned = cleaned.replace(/[•·]/g, ''); // Remove bullet points
+            
+            // Clean up multiple spaces and newlines
+            cleaned = cleaned.replace(/\s+/g, ' '); // Replace multiple spaces with single space
+            cleaned = cleaned.replace(/\n+/g, '. '); // Replace newlines with periods
+            
+            // Clean up multiple punctuation
+            cleaned = cleaned.replace(/\.{2,}/g, '.'); // Replace multiple periods with single
+            cleaned = cleaned.replace(/\s+([.,!?])/g, '$1'); // Remove space before punctuation
+            cleaned = cleaned.replace(/([.,!?])\s*([.,!?])/g, '$1'); // Remove duplicate punctuation
+            
+            return cleaned.trim();
+        }
+
+        async function startLeoTTS(text) {
+            try {
+                // Show loading state
+                isReading = true;
+                updateReadButton();
+                
+                // Call Leo TTS API
+                const response = await fetch(LEO_TTS_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${LEO_TTS_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        voice: 'leo',
+                        language: currentLanguage === 'hi' ? 'hi-IN' : currentLanguage === 'hinglish' ? 'hi-IN' : 'en-US',
+                        speed: 0.9
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Leo TTS API failed');
+                }
+
+                // Get audio blob
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                
+                // Create and play audio
+                currentAudio = new Audio(audioUrl);
+                
+                currentAudio.onplay = function() {
+                    isReading = true;
+                    updateReadButton();
+                };
+                
+                currentAudio.onended = function() {
+                    isReading = false;
+                    updateReadButton();
+                    URL.revokeObjectURL(audioUrl); // Clean up
+                };
+                
+                currentAudio.onerror = function(error) {
+                    console.error('Audio playback error:', error);
+                    isReading = false;
+                    updateReadButton();
+                    
+                    const msg = currentLanguage === 'hi' ? 
+                        'ऑडियो चलाने में त्रुटि हुई।' :
+                        currentLanguage === 'hinglish' ?
+                        'Audio play karne mein error hui.' :
+                        'Error playing audio.';
+                    alert(msg);
+                };
+                
+                currentAudio.play();
+                
+            } catch (error) {
+                console.error('Leo TTS Error:', error);
+                isReading = false;
+                updateReadButton();
+                
+                // Fallback to browser TTS
+                const msg = currentLanguage === 'hi' ? 
+                    'Leo TTS उपलब्ध नहीं है। ब्राउज़र TTS का उपयोग कर रहे हैं।' :
+                    currentLanguage === 'hinglish' ?
+                    'Leo TTS available nahi hai. Browser TTS use kar rahe hain.' :
+                    'Leo TTS not available. Using browser TTS.';
+                console.log(msg);
+                
+                startBrowserTTS(text);
+            }
+        }
+
+        function startBrowserTTS(text) {
+            // Check if speech synthesis is supported
+            if (!('speechSynthesis' in window)) {
+                const msg = currentLanguage === 'hi' ? 
+                    'आपका ब्राउज़र टेक्स्ट-टू-स्पीच का समर्थन नहीं करता है।' :
+                    currentLanguage === 'hinglish' ?
+                    'Aapka browser text-to-speech support nahi karta.' :
+                    'Your browser does not support text-to-speech.';
+                alert(msg);
+                return;
+            }
+
+            // Stop any ongoing speech
+            speechSynthesis.cancel();
+
+            // Create utterance
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            
+            // Set language based on current language
+            if (currentLanguage === 'hi') {
+                currentUtterance.lang = 'hi-IN'; // Hindi
+            } else {
+                currentUtterance.lang = 'en-US'; // English (for both English and Hinglish)
+            }
+            
+            // Set voice properties
+            currentUtterance.rate = 0.9; // Slightly slower for better comprehension
+            currentUtterance.pitch = 1.0;
+            currentUtterance.volume = 1.0;
+
+            // Try to find a better voice for the language
+            const voices = speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                let selectedVoice = null;
+                
+                if (currentLanguage === 'hi') {
+                    // Try to find Hindi voice
+                    selectedVoice = voices.find(voice => 
+                        voice.lang.startsWith('hi') || 
+                        voice.name.toLowerCase().includes('hindi')
+                    );
+                } else {
+                    // Try to find English voice
+                    selectedVoice = voices.find(voice => 
+                        voice.lang.startsWith('en') && 
+                        (voice.name.includes('Google') || voice.name.includes('Microsoft'))
+                    );
+                }
+                
+                if (selectedVoice) {
+                    currentUtterance.voice = selectedVoice;
+                }
+            }
+
+            // Event handlers
+            currentUtterance.onstart = function() {
+                isReading = true;
+                updateReadButton();
+            };
+
+            currentUtterance.onend = function() {
+                isReading = false;
+                updateReadButton();
+            };
+
+            currentUtterance.onerror = function(event) {
+                console.error('Speech error:', event);
+                isReading = false;
+                updateReadButton();
+                
+                const msg = currentLanguage === 'hi' ? 
+                    'पढ़ने में त्रुटि हुई।' :
+                    currentLanguage === 'hinglish' ?
+                    'Padhne mein error hui.' :
+                    'Error occurred while reading.';
+                alert(msg);
+            };
+
+            // Start speaking
+            speechSynthesis.speak(currentUtterance);
+        }
+
+        function stopReading() {
+            // Stop browser TTS
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+            
+            // Stop Leo TTS audio
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                currentAudio = null;
+            }
+            
+            isReading = false;
+            updateReadButton();
+        }
+
+        function updateReadButton() {
+            const btn = document.getElementById('readNotesBtn');
+            if (isReading) {
+                if (currentLanguage === 'hi') {
+                    btn.innerHTML = '<i class="fas fa-stop"></i> रोकें';
+                } else if (currentLanguage === 'hinglish') {
+                    btn.innerHTML = '<i class="fas fa-stop"></i> Roko';
+                } else {
+                    btn.innerHTML = '<i class="fas fa-stop"></i> Stop';
+                }
+                btn.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+            } else {
+                if (currentLanguage === 'hi') {
+                    btn.innerHTML = '<i class="fas fa-volume-up"></i> सुनें';
+                } else if (currentLanguage === 'hinglish') {
+                    btn.innerHTML = '<i class="fas fa-volume-up"></i> Suno';
+                } else {
+                    btn.innerHTML = '<i class="fas fa-volume-up"></i> Read Aloud';
+                }
+                btn.style.background = 'linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%)';
+            }
+        }
+
+        // Load voices when they become available
+        if ('speechSynthesis' in window) {
+            speechSynthesis.onvoiceschanged = function() {
+                const voices = speechSynthesis.getVoices();
+                console.log('Available voices:', voices.length);
+            };
+        }
+
+        function answerQuestion(question, context) {
+            // Enhanced question answering
+            const sentences = context.split(/[.!?]+/).filter(s => s.trim().length > 20);
+            const questionLower = question.toLowerCase();
+            const questionWords = questionLower.split(/\s+/).filter(w => w.length > 3);
+            
+            // Find most relevant sentences
+            const scoredSentences = sentences.map(sentence => {
+                const sentenceLower = sentence.toLowerCase();
+                let score = 0;
+                
+                // Score based on keyword matches
+                questionWords.forEach(word => {
+                    if (sentenceLower.includes(word)) {
+                        score += 2;
+                    }
+                });
+                
+                // Bonus for question type matches
+                if (questionLower.includes('what') || questionLower.includes('क्या')) {
+                    if (sentenceLower.includes('is') || sentenceLower.includes('are') || 
+                        sentenceLower.includes('है') || sentenceLower.includes('हैं')) {
+                        score += 1;
+                    }
+                }
+                
+                if (questionLower.includes('why') || questionLower.includes('क्यों')) {
+                    if (sentenceLower.includes('because') || sentenceLower.includes('therefore') ||
+                        sentenceLower.includes('क्योंकि') || sentenceLower.includes('इसलिए')) {
+                        score += 2;
+                    }
+                }
+                
+                if (questionLower.includes('how') || questionLower.includes('कैसे')) {
+                    if (sentenceLower.includes('by') || sentenceLower.includes('through') ||
+                        sentenceLower.includes('द्वारा') || sentenceLower.includes('से')) {
+                        score += 2;
+                    }
+                }
+                
+                return { sentence: sentence.trim(), score };
+            });
+            
+            // Sort by score and get top 2
+            scoredSentences.sort((a, b) => b.score - a.score);
+            const topSentences = scoredSentences.slice(0, 2).filter(s => s.score > 0);
+            
+            if (topSentences.length > 0) {
+                const answer = topSentences.map(s => s.sentence).join(' ');
+                return answer;
+            }
+            
+            return currentLanguage === 'hi' ? 
+                'मुझे इस प्रश्न का उत्तर सामग्री में नहीं मिला। कृपया अधिक विशिष्ट प्रश्न पूछें या अलग शब्दों का उपयोग करें।' :
+                'I could not find a specific answer in the material. Please try a more specific question or use different words.';
+        }
+
+        async function generateNotes() {
+            if (!uploadedText) {
+                alert(currentLanguage === 'hi' ? 
+                    'कृपया पहले एक फ़ाइल अपलोड करें।' : 
+                    'Please upload a file first.');
+                return;
+            }
+
+            const notesDiv = document.getElementById('notesContent');
+            notesDiv.innerHTML = '<p>Generating notes...</p>';
+
+            const prompt = currentLanguage === 'hi' ?
+                `निम्नलिखित पाठ के लिए विस्तृत नोट्स हिंदी में बनाएं:\n\n${uploadedText}` :
+                `Generate detailed study notes for the following text:\n\n${uploadedText}`;
+
+            try {
+                const notes = await callAI(prompt);
+                generatedNotes = notes;
+                notesDiv.innerHTML = `<div style="white-space: pre-wrap;">${notes}</div>`;
+            } catch (error) {
+                // Use local generation
+                const notes = extractKeyPoints(uploadedText);
+                generatedNotes = notes;
+                notesDiv.innerHTML = `<div style="white-space: pre-wrap;">${notes}</div>`;
+            }
+        }
+
+        function generateLocalMCQ(text) {
+            // Generate multiple challenging MCQs from content
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 30);
+            const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 50);
+            
+            if (sentences.length === 0) {
+                if (currentLanguage === 'hi') {
+                    return 'MCQ बनाने के लिए पर्याप्त सामग्री नहीं है।';
+                } else if (currentLanguage === 'hinglish') {
+                    return 'MCQ banane ke liye paryapt samagri nahi hai.';
+                } else {
+                    return 'Not enough content to generate MCQ.';
+                }
+            }
+            
+            if (currentLanguage === 'hi') {
+                mcqs = '📋 बहुविकल्पीय प्रश्न (कठिनाई: मध्यम से कठिन)\n\n';
+            } else if (currentLanguage === 'hinglish') {
+                mcqs = '📋 MULTIPLE CHOICE QUESTIONS (Difficulty: Medium se Hard)\n\n';
+            } else {
+                mcqs = '📋 Multiple Choice Questions (Difficulty: Medium to Hard)\n\n';
+            }
+            
+            // Generate 5-7 MCQs with different types
+            const numQuestions = Math.min(7, Math.max(5, Math.floor(sentences.length / 3)));
+            const usedIndices = new Set();
+            
+            const questionTypes = [
+                'fill-blank',
+                'concept',
+                'application',
+                'analysis',
+                'comparison'
+            ];
+            
+            for (let i = 0; i < numQuestions; i++) {
+                let idx;
+                do {
+                    idx = Math.floor(Math.random() * sentences.length);
+                } while (usedIndices.has(idx));
+                usedIndices.add(idx);
+                
+                const sentence = sentences[idx].trim();
+                const words = sentence.split(' ').filter(w => w.length > 4);
+                const questionType = questionTypes[i % questionTypes.length];
+                
+                if (words.length >= 4) {
+                    let question, correctAnswer, options;
+                    
+                    switch (questionType) {
+                        case 'fill-blank':
+                            // Fill in the blank type
+                            const keyword = words[Math.floor(Math.random() * words.length)];
+                            question = sentence.replace(new RegExp(`\\b${keyword}\\b`, 'i'), '______');
+                            correctAnswer = keyword;
+                            options = generateDistractors(keyword, words, text);
+                            break;
+                            
+                        case 'concept':
+                            // Conceptual understanding
+                            const concept = words.filter(w => w[0] === w[0].toUpperCase())[0] || words[0];
+                            if (currentLanguage === 'hi') {
+                                question = `${concept} का मुख्य उद्देश्य क्या है?`;
+                            } else if (currentLanguage === 'hinglish') {
+                                question = `${concept} ka main purpose kya hai?`;
+                            } else {
+                                question = `What is the primary purpose of ${concept}?`;
+                            }
+                            correctAnswer = sentence;
+                            options = generateConceptualOptions(sentence, sentences);
+                            break;
+                            
+                        case 'application':
+                            // Application-based
+                            if (currentLanguage === 'hi') {
+                                question = `निम्नलिखित में से कौन सा कथन सही है?`;
+                            } else if (currentLanguage === 'hinglish') {
+                                question = `Neeche diye gaye mein se kaun sa statement sahi hai?`;
+                            } else {
+                                question = `Which of the following statements is correct?`;
+                            }
+                            correctAnswer = sentence;
+                            options = generateApplicationOptions(sentence, sentences);
+                            break;
+                            
+                        case 'analysis':
+                            // Analysis type
+                            const keyTerm = words[Math.floor(words.length / 2)];
+                            if (currentLanguage === 'hi') {
+                                question = `${keyTerm} के संदर्भ में, निम्नलिखित में से क्या सत्य है?`;
+                            } else if (currentLanguage === 'hinglish') {
+                                question = `${keyTerm} ke context mein, neeche diye gaye mein se kya sach hai?`;
+                            } else {
+                                question = `In the context of ${keyTerm}, which of the following is true?`;
+                            }
+                            correctAnswer = sentence;
+                            options = generateAnalysisOptions(sentence, sentences);
+                            break;
+                            
+                        case 'comparison':
+                            // Comparison type
+                            if (currentLanguage === 'hi') {
+                                question = `निम्नलिखित में से कौन सा सबसे सटीक विवरण है?`;
+                            } else if (currentLanguage === 'hinglish') {
+                                question = `Neeche diye gaye mein se sabse accurate description kaun sa hai?`;
+                            } else {
+                                question = `Which of the following is the most accurate description?`;
+                            }
+                            correctAnswer = sentence;
+                            options = generateComparisonOptions(sentence, sentences);
+                            break;
+                    }
+                    
+                    // Shuffle options
+                    const allOptions = [correctAnswer, ...options].slice(0, 4);
+                    const shuffled = shuffleArray(allOptions);
+                    const correctIndex = shuffled.indexOf(correctAnswer);
+                    const correctLetter = String.fromCharCode(65 + correctIndex); // A, B, C, D
+                    
+                    if (currentLanguage === 'hi') {
+                        mcqs += `प्रश्न ${i + 1}: ${question}\n\n`;
+                        shuffled.forEach((opt, idx) => {
+                            const letter = String.fromCharCode(65 + idx);
+                            const truncated = opt.length > 80 ? opt.substring(0, 80) + '...' : opt;
+                            mcqs += `${letter}) ${truncated}\n`;
+                        });
+                        mcqs += `\n✓ सही उत्तर: ${correctLetter}\n`;
+                        mcqs += `💡 स्पष्टीकरण: ${correctAnswer.substring(0, 100)}${correctAnswer.length > 100 ? '...' : ''}\n\n`;
+                    } else if (currentLanguage === 'hinglish') {
+                        mcqs += `Question ${i + 1}: ${question}\n\n`;
+                        shuffled.forEach((opt, idx) => {
+                            const letter = String.fromCharCode(65 + idx);
+                            const truncated = opt.length > 80 ? opt.substring(0, 80) + '...' : opt;
+                            mcqs += `${letter}) ${truncated}\n`;
+                        });
+                        mcqs += `\n✓ Sahi Answer: ${correctLetter}\n`;
+                        mcqs += `💡 Explanation: ${correctAnswer.substring(0, 100)}${correctAnswer.length > 100 ? '...' : ''}\n\n`;
+                    } else {
+                        mcqs += `Question ${i + 1}: ${question}\n\n`;
+                        shuffled.forEach((opt, idx) => {
+                            const letter = String.fromCharCode(65 + idx);
+                            const truncated = opt.length > 80 ? opt.substring(0, 80) + '...' : opt;
+                            mcqs += `${letter}) ${truncated}\n`;
+                        });
+                        mcqs += `\n✓ Correct Answer: ${correctLetter}\n`;
+                        mcqs += `💡 Explanation: ${correctAnswer.substring(0, 100)}${correctAnswer.length > 100 ? '...' : ''}\n\n`;
+                    }
+                }
+            }
+            
+            return mcqs;
+        }
+
+        function generateDistractors(correct, words, text) {
+            // Generate plausible wrong answers
+            const distractors = words.filter(w => 
+                w !== correct && 
+                w.length >= correct.length - 2 && 
+                w.length <= correct.length + 2
+            ).slice(0, 3);
+            
+            while (distractors.length < 3) {
+                const filler = currentLanguage === 'hi' ? 
+                    ['कोई नहीं', 'उपरोक्त सभी', 'इनमें से कोई नहीं'][distractors.length] :
+                    ['None of these', 'All of the above', 'Not mentioned'][distractors.length];
+                distractors.push(filler);
+            }
+            
+            return distractors;
+        }
+
+        function generateConceptualOptions(correct, allSentences) {
+            const options = allSentences
+                .filter(s => s !== correct && s.length > 30)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            return options;
+        }
+
+        function generateApplicationOptions(correct, allSentences) {
+            return generateConceptualOptions(correct, allSentences);
+        }
+
+        function generateAnalysisOptions(correct, allSentences) {
+            return generateConceptualOptions(correct, allSentences);
+        }
+
+        function generateComparisonOptions(correct, allSentences) {
+            return generateConceptualOptions(correct, allSentences);
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        async function generateMCQ() {
+            if (!uploadedText) {
+                alert(currentLanguage === 'hi' ? 
+                    'कृपया पहले एक फ़ाइल अपलोड करें।' : 
+                    'Please upload a file first.');
+                return;
+            }
+
+            const mcqDiv = document.getElementById('mcqContent');
+            mcqDiv.innerHTML = '<p>Generating MCQ...</p>';
+
+            const prompt = currentLanguage === 'hi' ?
+                `निम्नलिखित पाठ के आधार पर 3 बहुविकल्पीय प्रश्न हिंदी में बनाएं:\n\n${uploadedText}` :
+                `Generate 3 multiple choice questions based on the following text:\n\n${uploadedText}`;
+
+            try {
+                const mcq = await callAI(prompt);
+                mcqDiv.innerHTML = `<div style="white-space: pre-wrap;">${mcq}</div>`;
+            } catch (error) {
+                // Use local generation
+                const mcq = generateLocalMCQ(uploadedText);
+                mcqDiv.innerHTML = `<div style="white-space: pre-wrap;">${mcq}</div>`;
+            }
+        }
+
+        function generateLocalWrittenQuestions(text) {
+            // Generate essay-style questions
+            const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 50);
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 30);
+            
+            let questions = '';
+            let templates = [];
+            
+            if (currentLanguage === 'hi') {
+                questions = '✍️ लिखित प्रश्न (विस्तृत उत्तर आवश्यक)\n\n';
+                templates = [
+                    { type: 'व्याख्या करें', difficulty: 'मध्यम' },
+                    { type: 'विस्तार से बताएं', difficulty: 'मध्यम' },
+                    { type: 'तुलना और विरोधाभास करें', difficulty: 'कठिन' },
+                    { type: 'विश्लेषण करें', difficulty: 'कठिन' },
+                    { type: 'मूल्यांकन करें', difficulty: 'कठिन' },
+                    { type: 'चर्चा करें', difficulty: 'मध्यम' }
+                ];
+            } else if (currentLanguage === 'hinglish') {
+                questions = '✍️ WRITTEN QUESTIONS (Detailed Answer Required)\n\n';
+                templates = [
+                    { type: 'Detail mein explain karo', difficulty: 'Medium' },
+                    { type: 'Poori tarah se describe karo', difficulty: 'Medium' },
+                    { type: 'Compare aur contrast karo', difficulty: 'Hard' },
+                    { type: 'Critically analyze karo', difficulty: 'Hard' },
+                    { type: 'Evaluate karo', difficulty: 'Hard' },
+                    { type: 'Discuss karo', difficulty: 'Medium' }
+                ];
+            } else {
+                questions = '✍️ Written Questions (Detailed Answers Required)\n\n';
+                templates = [
+                    { type: 'Explain in detail', difficulty: 'Medium' },
+                    { type: 'Describe comprehensively', difficulty: 'Medium' },
+                    { type: 'Compare and contrast', difficulty: 'Hard' },
+                    { type: 'Analyze critically', difficulty: 'Hard' },
+                    { type: 'Evaluate', difficulty: 'Hard' },
+                    { type: 'Discuss', difficulty: 'Medium' }
+                ];
+            }
+            
+            // Extract topics from paragraphs
+            const topics = [];
+            paragraphs.forEach(p => {
+                const lines = p.split('\n');
+                const heading = lines[0].trim();
+                if (heading.length < 100 && heading.length > 10) {
+                    topics.push(heading);
+                }
+            });
+            
+            // If no clear topics, use key sentences
+            if (topics.length < 3) {
+                sentences.slice(0, 5).forEach(s => {
+                    const words = s.trim().split(' ');
+                    if (words.length > 10) {
+                        topics.push(s.trim().substring(0, 80) + '...');
+                    }
+                });
+            }
+            
+            // Generate questions
+            const numQuestions = Math.min(5, topics.length);
+            for (let i = 0; i < numQuestions; i++) {
+                const template = templates[i % templates.length];
+                const topic = topics[i];
+                
+                if (currentLanguage === 'hi') {
+                    questions += `प्रश्न ${i + 1} [कठिनाई: ${template.difficulty}]:\n`;
+                    questions += `${template.type}: ${topic}\n\n`;
+                    questions += `📝 अपेक्षित उत्तर लंबाई: 150-200 शब्द\n`;
+                    questions += `⏱️ अनुशंसित समय: ${template.difficulty === 'कठिन' ? '15-20' : '10-15'} मिनट\n\n`;
+                } else if (currentLanguage === 'hinglish') {
+                    questions += `Question ${i + 1} [Difficulty: ${template.difficulty}]:\n`;
+                    questions += `${template.type}: ${topic}\n\n`;
+                    questions += `📝 Expected Answer Length: 150-200 words\n`;
+                    questions += `⏱️ Recommended Time: ${template.difficulty === 'Hard' ? '15-20' : '10-15'} minutes\n\n`;
+                } else {
+                    questions += `Question ${i + 1} [Difficulty: ${template.difficulty}]:\n`;
+                    questions += `${template.type}: ${topic}\n\n`;
+                    questions += `📝 Expected Answer Length: 150-200 words\n`;
+                    questions += `⏱️ Recommended Time: ${template.difficulty === 'Hard' ? '15-20' : '10-15'} minutes\n\n`;
+                }
+            }
+            
+            return questions;
+        }
+
+        async function generateWritten() {
+            if (!uploadedText) {
+                alert(currentLanguage === 'hi' ? 
+                    'कृपया पहले एक फ़ाइल अपलोड करें।' : 
+                    'Please upload a file first.');
+                return;
+            }
+
+            const writtenDiv = document.getElementById('writtenContent');
+            writtenDiv.innerHTML = '<p>Generating written questions...</p>';
+
+            const prompt = currentLanguage === 'hi' ?
+                `निम्नलिखित पाठ के आधार पर 3 लिखित प्रश्न हिंदी में बनाएं:\n\n${uploadedText}` :
+                `Generate 3 written questions based on the following text:\n\n${uploadedText}`;
+
+            try {
+                const written = await callAI(prompt);
+                writtenDiv.innerHTML = `<div style="white-space: pre-wrap;">${written}</div>`;
+            } catch (error) {
+                // Use local generation
+                const written = generateLocalWrittenQuestions(uploadedText);
+                writtenDiv.innerHTML = `<div style="white-space: pre-wrap;">${written}</div>`;
+            }
+        }
+
+        function generateLocalFlashcards(text) {
+            // Generate multiple flashcards from content
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 30);
+            const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 50);
+            
+            const cards = [];
+            
+            // Strategy 1: Use headings and following content
+            paragraphs.forEach(para => {
+                const lines = para.trim().split('\n');
+                if (lines.length > 1 && lines[0].length < 100) {
+                    const heading = lines[0].trim();
+                    const content = lines.slice(1).join(' ').trim();
+                    if (content.length > 20) {
+                        let frontText = '';
+                        if (currentLanguage === 'hi') {
+                            frontText = `प्रश्न: ${heading} क्या है?`;
+                        } else if (currentLanguage === 'hinglish') {
+                            frontText = `Question: ${heading} kya hai?`;
+                        } else {
+                            frontText = `What is ${heading}?`;
+                        }
+                        
+                        cards.push({
+                            front: frontText,
+                            back: content.substring(0, 200) + (content.length > 200 ? '...' : '')
+                        });
+                    }
+                }
+            });
+            
+            // Strategy 2: Create definition-style cards
+            sentences.forEach(sentence => {
+                const words = sentence.trim().split(' ');
+                if (words.length > 10) {
+                    // Find key terms (capitalized words or longer words)
+                    const keyTerms = words.filter(w => 
+                        (w.length > 6 && w[0] === w[0].toUpperCase()) || w.length > 10
+                    );
+                    
+                    if (keyTerms.length > 0) {
+                        const term = keyTerms[0];
+                        let frontText = '';
+                        if (currentLanguage === 'hi') {
+                            frontText = `${term} को परिभाषित करें`;
+                        } else if (currentLanguage === 'hinglish') {
+                            frontText = `Define: ${term}`;
+                        } else {
+                            frontText = `Define: ${term}`;
+                        }
+                        
+                        cards.push({
+                            front: frontText,
+                            back: sentence.trim()
+                        });
+                    }
+                }
+            });
+            
+            // Strategy 3: Question-answer pairs
+            for (let i = 0; i < Math.min(3, sentences.length - 1); i++) {
+                const idx = Math.floor(Math.random() * (sentences.length - 1));
+                let frontText = '';
+                if (currentLanguage === 'hi') {
+                    frontText = `इस बारे में बताएं: ${sentences[idx].trim().substring(0, 50)}...`;
+                } else if (currentLanguage === 'hinglish') {
+                    frontText = `Explain: ${sentences[idx].trim().substring(0, 50)}...`;
+                } else {
+                    frontText = `Explain: ${sentences[idx].trim().substring(0, 50)}...`;
+                }
+                
+                cards.push({
+                    front: frontText,
+                    back: sentences[idx + 1].trim()
+                });
+            }
+            
+            // Strategy 4: Why/How questions
+            sentences.forEach((sentence, idx) => {
+                if (sentence.toLowerCase().includes('because') || 
+                    sentence.toLowerCase().includes('therefore') ||
+                    sentence.toLowerCase().includes('thus') ||
+                    sentence.includes('क्योंकि') ||
+                    sentence.includes('इसलिए')) {
+                    const parts = sentence.split(/because|therefore|thus|क्योंकि|इसलिए/i);
+                    if (parts.length > 1) {
+                        let frontText = '';
+                        if (currentLanguage === 'hi') {
+                            frontText = `क्यों: ${parts[0].trim()}?`;
+                        } else if (currentLanguage === 'hinglish') {
+                            frontText = `Why: ${parts[0].trim()}?`;
+                        } else {
+                            frontText = `Why: ${parts[0].trim()}?`;
+                        }
+                        
+                        cards.push({
+                            front: frontText,
+                            back: parts[1].trim()
+                        });
+                    }
+                }
+            });
+            
+            // Return up to 8 unique cards
+            const uniqueCards = cards.filter((card, index, self) =>
+                index === self.findIndex(c => c.front === card.front)
+            ).slice(0, 8);
+            
+            if (uniqueCards.length > 0) {
+                return uniqueCards;
+            } else {
+                let frontText = '';
+                let backText = sentences[0]?.trim() || 'No content available';
+                
+                if (currentLanguage === 'hi') {
+                    frontText = 'मुख्य विषय क्या है?';
+                    backText = sentences[0]?.trim() || 'कोई सामग्री उपलब्ध नहीं है';
+                } else if (currentLanguage === 'hinglish') {
+                    frontText = 'Main topic kya hai?';
+                    backText = sentences[0]?.trim() || 'Koi content available nahi hai';
+                } else {
+                    frontText = 'What is the main topic?';
+                    backText = sentences[0]?.trim() || 'No content available';
+                }
+                
+                return [{
+                    front: frontText,
+                    back: backText
+                }];
+            }
+        }
+
+        async function generateFlashcard() {
+            if (!uploadedText) {
+                alert(currentLanguage === 'hi' ? 
+                    'कृपया पहले एक फ़ाइल अपलोड करें।' : 
+                    'Please upload a file first.');
+                return;
+            }
+
+            const flashcardDiv = document.getElementById('flashcardContent');
+            flashcardDiv.innerHTML = '<p>Generating flashcards...</p>';
+
+            const prompt = currentLanguage === 'hi' ?
+                `निम्नलिखित पाठ के आधार पर 5 फ्लैशकार्ड बनाएं (प्रत्येक में सामने एक प्रश्न और पीछे उत्तर):\n\n${uploadedText}` :
+                `Generate 5 flashcards based on the following text (each with a question on front and answer on back):\n\n${uploadedText}`;
+
+            try {
+                const flashcardText = await callAI(prompt);
+                
+                // Parse flashcards from AI response
+                const lines = flashcardText.split('\n').filter(l => l.trim());
+                flashcards = [];
+                
+                for (let i = 0; i < lines.length; i += 2) {
+                    if (lines[i] && lines[i + 1]) {
+                        flashcards.push({
+                            front: lines[i].replace(/^\d+\.|Front:|Q:|सामने:|प्रश्न:/gi, '').trim(),
+                            back: lines[i + 1].replace(/Back:|A:|पीछे:|उत्तर:/gi, '').trim()
+                        });
+                    }
+                }
+
+                if (flashcards.length === 0) {
+                    throw new Error('No flashcards parsed from AI response');
+                }
+            } catch (error) {
+                // Use local generation
+                flashcards = generateLocalFlashcards(uploadedText);
+            }
+
+            currentFlashcardIndex = 0;
+            displayFlashcard();
+        }
+
+        function displayFlashcard() {
+            if (flashcards.length === 0) return;
+            
+            const card = flashcards[currentFlashcardIndex];
+            const flashcardHTML = `
+                <div class="flashcard" onclick="flipCard(this)">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">${card.front}</div>
+                        <div class="flashcard-back">${card.back}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <button onclick="previousFlashcard()">← Previous</button>
+                    <span style="margin: 0 1rem;">${currentFlashcardIndex + 1} / ${flashcards.length}</span>
+                    <button onclick="nextFlashcard()">Next →</button>
+                </div>
+            `;
+            document.getElementById('flashcardContent').innerHTML = flashcardHTML;
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        function nextFlashcard() {
+            if (currentFlashcardIndex < flashcards.length - 1) {
+                currentFlashcardIndex++;
+                displayFlashcard();
+            }
+        }
+
+        function previousFlashcard() {
+            if (currentFlashcardIndex > 0) {
+                currentFlashcardIndex--;
+                displayFlashcard();
+            }
+        }
+
+        // Mind Map Variables
+        let mindMapData = null;
+        let canvas = null;
+        let ctx = null;
+        let scale = 1;
+        let offsetX = 0;
+        let offsetY = 0;
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+
+        async function generateMindMap() {
+            if (!uploadedText) {
+                alert(currentLanguage === 'hi' ? 
+                    'कृपया पहले एक फ़ाइल अपलोड करें।' : 
+                    'Please upload a file first.');
+                return;
+            }
+
+            const container = document.getElementById('mindmapContainer');
+            container.style.display = 'block';
+            
+            canvas = document.getElementById('mindmapCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Show loading
+            ctx.fillStyle = '#d4af37';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Generating mind map...', canvas.width / 2, canvas.height / 2);
+
+            try {
+                // Extract key concepts from text
+                mindMapData = extractMindMapData(uploadedText);
+                
+                // Draw the mind map
+                drawMindMap();
+                
+                // Add event listeners for pan/zoom
+                setupCanvasInteraction();
+                
+            } catch (error) {
+                console.error('Mind map generation error:', error);
+                ctx.fillStyle = '#dc3545';
+                ctx.fillText('Error generating mind map', canvas.width / 2, canvas.height / 2);
+            }
+        }
+
+        function extractMindMapData(text) {
+            // Extract main topic and subtopics with maximum detail and clarity
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 15);
+            const words = text.toLowerCase().split(/\s+/);
+            
+            // Common words to exclude
+            const commonWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should', 'could', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'it', 'its', 'they', 'them', 'their', 'what', 'which', 'who', 'when', 'where', 'why', 'how', 'also', 'very', 'more', 'most', 'some', 'such']);
+            
+            // Count word frequency
+            const wordFreq = {};
+            words.forEach(word => {
+                const cleaned = word.replace(/[^a-zA-Z0-9]/g, '');
+                if (cleaned.length > 3 && !commonWords.has(cleaned)) {
+                    wordFreq[cleaned] = (wordFreq[cleaned] || 0) + 1;
+                }
+            });
+            
+            // Get top keywords
+            const keywords = Object.entries(wordFreq)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 15)
+                .map(([word]) => word.charAt(0).toUpperCase() + word.slice(1));
+            
+            // Create DETAILED main topic - full sentence without truncation
+            let mainTopic = 'Main Topic';
+            if (sentences[0]) {
+                const firstSentence = sentences[0].trim();
+                // Use complete sentence up to 120 characters
+                if (firstSentence.length > 120) {
+                    const lastSpace = firstSentence.substring(0, 120).lastIndexOf(' ');
+                    mainTopic = firstSentence.substring(0, lastSpace > 0 ? lastSpace : 120);
+                } else {
+                    mainTopic = firstSentence;
+                }
+            }
+            
+            // Create 5 PRIMARY branches with DETAILED information
+            const primaryTopics = keywords.slice(0, 5).map((keyword, index) => {
+                // Find ALL sentences containing this keyword
+                const relatedSentences = sentences.filter(s => 
+                    s.toLowerCase().includes(keyword.toLowerCase())
+                );
+                
+                // Get COMPLETE, DETAILED description
+                let details = '';
+                if (relatedSentences.length > 0) {
+                    // Use the most informative sentence
+                    const bestSentence = relatedSentences.reduce((longest, current) => 
+                        current.length > longest.length ? current : longest
+                    );
+                    
+                    // Keep full sentence up to 150 characters for maximum detail
+                    if (bestSentence.length > 150) {
+                        const lastSpace = bestSentence.substring(0, 150).lastIndexOf(' ');
+                        details = bestSentence.substring(0, lastSpace > 0 ? lastSpace : 150);
+                    } else {
+                        details = bestSentence.trim();
+                    }
+                } else {
+                    details = `Important concept: ${keyword}`;
+                }
+                
+                // Create 3 SUB-BRANCHES per primary topic with detailed info
+                const subBranches = [];
+                const startIdx = index * 2;
+                const subKeywords = keywords.slice(5, 15);
+                
+                for (let i = 0; i < 3 && (startIdx + i) < subKeywords.length; i++) {
+                    const subKeyword = subKeywords[startIdx + i];
+                    const subSentences = sentences.filter(s => 
+                        s.toLowerCase().includes(subKeyword.toLowerCase())
+                    );
+                    
+                    let subDetails = '';
+                    if (subSentences.length > 0) {
+                        const subSentence = subSentences[0].trim();
+                        // Keep detailed sub-branch info up to 100 chars
+                        if (subSentence.length > 100) {
+                            const lastSpace = subSentence.substring(0, 100).lastIndexOf(' ');
+                            subDetails = subSentence.substring(0, lastSpace > 0 ? lastSpace : 100);
+                        } else {
+                            subDetails = subSentence;
+                        }
+                    } else {
+                        subDetails = `Related to ${keyword}`;
+                    }
+                    
+                    subBranches.push({
+                        title: subKeyword,
+                        details: subDetails
+                    });
+                }
+                
+                return {
+                    title: keyword,
+                    details: details,
+                    subBranches: subBranches,
+                    frequency: wordFreq[keyword.toLowerCase()] || 1
+                };
+            });
+            
+            return {
+                center: mainTopic,
+                branches: primaryTopics,
+                totalConcepts: keywords.length,
+                textLength: text.length
+            };
+        }
+
+        function drawMindMap() {
+            if (!mindMapData || !ctx) return;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Apply transformations
+            ctx.save();
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(scale, scale);
+            
+            const centerX = canvas.width / 2 / scale;
+            const centerY = canvas.height / 2 / scale;
+            const centerRadius = 80;
+            const branchDistance = 350; // Increased from 280 to avoid overlap
+            const subBranchDistance = 180; // Increased from 140 to avoid overlap
+            
+            // Draw all connections first (so they appear behind nodes)
+            ctx.strokeStyle = '#d4af37';
+            ctx.lineWidth = 3;
+            
+            // Draw primary connections
+            mindMapData.branches.forEach((branch, index) => {
+                const angle = (Math.PI * 2 * index) / mindMapData.branches.length - Math.PI / 2;
+                const branchX = centerX + Math.cos(angle) * branchDistance;
+                const branchY = centerY + Math.sin(angle) * branchDistance;
+                
+                // Draw main line with gradient
+                const gradient = ctx.createLinearGradient(centerX, centerY, branchX, branchY);
+                gradient.addColorStop(0, '#d4af37');
+                gradient.addColorStop(1, '#f0e68c');
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 3;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(branchX, branchY);
+                ctx.stroke();
+                
+                // Draw sub-branch connections with better spacing
+                if (branch.subBranches && branch.subBranches.length > 0) {
+                    ctx.strokeStyle = '#f0e68c';
+                    ctx.lineWidth = 2;
+                    
+                    branch.subBranches.forEach((subBranch, subIndex) => {
+                        // Calculate angle offset to avoid overlaps
+                        const angleOffset = (subIndex === 0 ? -0.5 : 0.5); // Increased from 0.3
+                        const subAngle = angle + angleOffset;
+                        const subX = branchX + Math.cos(subAngle) * subBranchDistance;
+                        const subY = branchY + Math.sin(subAngle) * subBranchDistance;
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(branchX, branchY);
+                        ctx.lineTo(subX, subY);
+                        ctx.stroke();
+                    });
+                }
+            });
+            
+            // Draw center node (largest) - ONLY SHORT TITLE INSIDE
+            const centerTitle = mindMapData.center.split(' ').slice(0, 4).join(' '); // First 4 words only
+            drawNode(ctx, centerX, centerY, centerRadius, centerTitle, '#d4af37', '#000000', true, 'center');
+            
+            // Draw FULL DESCRIPTION OUTSIDE in a prominent box at top
+            const mainDescBoxWidth = 300;
+            const mainDescBoxHeight = 70;
+            const mainDescBoxX = centerX - mainDescBoxWidth/2;
+            const mainDescBoxY = centerY - centerRadius - 100;
+            
+            // Main description box
+            ctx.fillStyle = 'rgba(26, 26, 26, 0.95)';
+            ctx.fillRect(mainDescBoxX, mainDescBoxY, mainDescBoxWidth, mainDescBoxHeight);
+            
+            // Box border with glow
+            ctx.strokeStyle = '#d4af37';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(mainDescBoxX, mainDescBoxY, mainDescBoxWidth, mainDescBoxHeight);
+            
+            // Title label
+            ctx.fillStyle = '#d4af37';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('MAIN TOPIC', centerX, mainDescBoxY + 15);
+            
+            // Full description text
+            ctx.fillStyle = '#f0e68c';
+            ctx.font = '11px Arial';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            wrapTextInBox(ctx, mindMapData.center, mainDescBoxX + 10, mainDescBoxY + 25, mainDescBoxWidth - 20, 13);
+            
+            // Draw info badge on center - positioned below
+            ctx.fillStyle = '#f0e68c';
+            ctx.font = 'bold 11px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${mindMapData.totalConcepts} concepts`, centerX, centerY + centerRadius + 20);
+            
+            // Draw primary branch nodes
+            mindMapData.branches.forEach((branch, index) => {
+                const angle = (Math.PI * 2 * index) / mindMapData.branches.length - Math.PI / 2;
+                const branchX = centerX + Math.cos(angle) * branchDistance;
+                const branchY = centerY + Math.sin(angle) * branchDistance;
+                
+                // Draw primary node - ONLY TITLE INSIDE
+                drawNode(ctx, branchX, branchY, 65, branch.title, '#f0e68c', '#1a1a1a', false, 'primary');
+                
+                // Draw DETAILED DESCRIPTION OUTSIDE in a box - positioned further away
+                const isBottom = Math.sin(angle) > 0;
+                const isRight = Math.cos(angle) > 0;
+                const detailBoxY = isBottom ? branchY + 100 : branchY - 180; // Increased distance
+                const detailBoxWidth = 180;
+                const detailBoxHeight = 70;
+                
+                // Draw description box
+                ctx.fillStyle = 'rgba(26, 26, 26, 0.95)';
+                ctx.fillRect(branchX - detailBoxWidth/2, detailBoxY, detailBoxWidth, detailBoxHeight);
+                
+                // Box border
+                ctx.strokeStyle = '#d4af37';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(branchX - detailBoxWidth/2, detailBoxY, detailBoxWidth, detailBoxHeight);
+                
+                // Description text inside box
+                ctx.fillStyle = '#f0e68c';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                wrapTextInBox(ctx, branch.details, branchX - detailBoxWidth/2 + 8, detailBoxY + 8, detailBoxWidth - 16, 12);
+                
+                // Draw frequency badge - positioned away from box
+                const badgeX = branchX + (isRight ? 55 : -55);
+                const badgeY = branchY - 40;
+                
+                ctx.fillStyle = '#d4af37';
+                ctx.beginPath();
+                ctx.arc(badgeX, badgeY, 12, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                ctx.fillStyle = '#000000';
+                ctx.font = 'bold 10px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(branch.frequency, badgeX, badgeY);
+                
+                // Draw sub-branches - with wider angle spread
+                if (branch.subBranches && branch.subBranches.length > 0) {
+                    branch.subBranches.forEach((subBranch, subIndex) => {
+                        // Wider angle spread to avoid overlap
+                        const angleOffset = (subIndex === 0 ? -0.6 : subIndex === 1 ? 0.6 : 0);
+                        const subAngle = angle + angleOffset;
+                        const subX = branchX + Math.cos(subAngle) * subBranchDistance;
+                        const subY = branchY + Math.sin(subAngle) * subBranchDistance;
+                        
+                        // Draw sub-node - ONLY TITLE INSIDE
+                        drawNode(ctx, subX, subY, 40, subBranch.title, '#b8941e', '#f0e68c', false, 'sub');
+                        
+                        // Draw DETAILED DESCRIPTION OUTSIDE in smaller box
+                        const isSubBottom = Math.sin(subAngle) > 0;
+                        const subDetailBoxY = isSubBottom ? subY + 55 : subY - 115; // Increased distance
+                        const subDetailBoxWidth = 140;
+                        const subDetailBoxHeight = 55;
+                        
+                        // Sub-description box
+                        ctx.fillStyle = 'rgba(26, 26, 26, 0.9)';
+                        ctx.fillRect(subX - subDetailBoxWidth/2, subDetailBoxY, subDetailBoxWidth, subDetailBoxHeight);
+                        
+                        // Sub-box border
+                        ctx.strokeStyle = '#f0e68c';
+                        ctx.lineWidth = 1.5;
+                        ctx.strokeRect(subX - subDetailBoxWidth/2, subDetailBoxY, subDetailBoxWidth, subDetailBoxHeight);
+                        
+                        // Sub-description text
+                        ctx.fillStyle = '#f0e68c';
+                        ctx.font = '9px Arial';
+                        ctx.textAlign = 'left';
+                        ctx.textBaseline = 'top';
+                        wrapTextInBox(ctx, subBranch.details, subX - subDetailBoxWidth/2 + 6, subDetailBoxY + 6, subDetailBoxWidth - 12, 11);
+                    });
+                }
+            });
+            
+            // Draw legend
+            drawLegend(ctx, 20 / scale, 20 / scale);
+            
+            ctx.restore();
+        }
+
+        function drawNode(ctx, x, y, radius, text, fillColor, textColor, isCenter, nodeType) {
+            // Draw shadow
+            ctx.shadowColor = 'rgba(212, 175, 55, 0.4)';
+            ctx.shadowBlur = isCenter ? 15 : 8;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // Draw circle with gradient
+            const gradient = ctx.createRadialGradient(x - radius/3, y - radius/3, 0, x, y, radius);
+            gradient.addColorStop(0, fillColor);
+            
+            if (nodeType === 'center') {
+                gradient.addColorStop(1, '#b8941e');
+            } else if (nodeType === 'primary') {
+                gradient.addColorStop(1, '#d4af37');
+            } else {
+                gradient.addColorStop(1, '#8b7500');
+            }
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            
+            // Draw border with double ring for center
+            if (isCenter) {
+                ctx.strokeStyle = '#d4af37';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#f0e68c';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(x, y, radius - 5, 0, Math.PI * 2);
+                ctx.stroke();
+            } else {
+                ctx.strokeStyle = '#d4af37';
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+            }
+            
+            // Draw icon based on node type - positioned above to avoid overlap
+            if (isCenter) {
+                ctx.fillStyle = textColor;
+                ctx.font = '20px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('★', x, y - radius - 8);
+            }
+            
+            // Draw text
+            ctx.fillStyle = textColor;
+            ctx.font = isCenter ? 'bold 14px Arial' : nodeType === 'sub' ? 'bold 10px Arial' : 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const maxWidth = radius * 1.7; // Increased from 1.5 to 1.7
+            const lineHeight = isCenter ? 16 : nodeType === 'sub' ? 12 : 14;
+            wrapText(ctx, text, x, y, maxWidth, lineHeight);
+        }
+
+        function drawLegend(ctx, x, y) {
+            ctx.save();
+            
+            // Legend background
+            ctx.fillStyle = 'rgba(26, 26, 26, 0.9)';
+            ctx.fillRect(x, y, 180, 100);
+            ctx.strokeStyle = '#d4af37';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, 180, 100);
+            
+            // Title
+            ctx.fillStyle = '#d4af37';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('Legend:', x + 10, y + 20);
+            
+            // Center node
+            ctx.fillStyle = '#d4af37';
+            ctx.beginPath();
+            ctx.arc(x + 20, y + 40, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#f0e68c';
+            ctx.font = '10px Arial';
+            ctx.fillText('Main Topic', x + 35, y + 43);
+            
+            // Primary node
+            ctx.fillStyle = '#f0e68c';
+            ctx.beginPath();
+            ctx.arc(x + 20, y + 60, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#f0e68c';
+            ctx.fillText('Key Concepts', x + 35, y + 63);
+            
+            // Sub node
+            ctx.fillStyle = '#b8941e';
+            ctx.beginPath();
+            ctx.arc(x + 20, y + 80, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#f0e68c';
+            ctx.fillText('Related Topics', x + 35, y + 83);
+            
+            ctx.restore();
+        }
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            let lines = [];
+            
+            words.forEach(word => {
+                const testLine = line + word + ' ';
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > maxWidth && line !== '') {
+                    lines.push(line);
+                    line = word + ' ';
+                } else {
+                    line = testLine;
+                }
+            });
+            lines.push(line);
+            
+            // Show MORE lines for detailed understanding - increased from 4 to 6
+            const maxLines = 6;
+            if (lines.length > maxLines) {
+                lines = lines.slice(0, maxLines);
+                // Only add ellipsis if there's actually more text
+                const lastLine = lines[maxLines - 1].trim();
+                if (lastLine.length > 0 && words.length > lines.join(' ').split(' ').length) {
+                    lines[maxLines - 1] = lastLine + '...';
+                }
+            }
+            
+            const startY = y - (lines.length - 1) * lineHeight / 2;
+            lines.forEach((line, index) => {
+                ctx.fillText(line.trim(), x, startY + index * lineHeight);
+            });
+        }
+
+        function wrapTextInBox(ctx, text, x, y, maxWidth, lineHeight) {
+            // Wrap text for description boxes - left aligned
+            const words = text.split(' ');
+            let line = '';
+            let lines = [];
+            
+            words.forEach(word => {
+                const testLine = line + word + ' ';
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > maxWidth && line !== '') {
+                    lines.push(line);
+                    line = word + ' ';
+                } else {
+                    line = testLine;
+                }
+            });
+            if (line.trim()) {
+                lines.push(line);
+            }
+            
+            // Limit lines to fit in box
+            const maxLines = 5;
+            if (lines.length > maxLines) {
+                lines = lines.slice(0, maxLines);
+                const lastLine = lines[maxLines - 1].trim();
+                lines[maxLines - 1] = lastLine.substring(0, lastLine.length - 3) + '...';
+            }
+            
+            lines.forEach((line, index) => {
+                ctx.fillText(line.trim(), x, y + index * lineHeight);
+            });
+        }
+
+        function setupCanvasInteraction() {
+            canvas.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                dragStartX = e.clientX - offsetX;
+                dragStartY = e.clientY - offsetY;
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    offsetX = e.clientX - dragStartX;
+                    offsetY = e.clientY - dragStartY;
+                    drawMindMap();
+                }
+            });
+            
+            canvas.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+            
+            canvas.addEventListener('mouseleave', () => {
+                isDragging = false;
+            });
+            
+            // Touch support
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                isDragging = true;
+                dragStartX = touch.clientX - offsetX;
+                dragStartY = touch.clientY - offsetY;
+            });
+            
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (isDragging) {
+                    const touch = e.touches[0];
+                    offsetX = touch.clientX - dragStartX;
+                    offsetY = touch.clientY - dragStartY;
+                    drawMindMap();
+                }
+            });
+            
+            canvas.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+        }
+
+        function zoomIn() {
+            scale = Math.min(scale * 1.2, 3);
+            drawMindMap();
+        }
+
+        function zoomOut() {
+            scale = Math.max(scale / 1.2, 0.3);
+            drawMindMap();
+        }
+
+        function resetZoom() {
+            scale = 1;
+            offsetX = 0;
+            offsetY = 0;
+            drawMindMap();
+        }
+
+        function downloadMindMap() {
+            if (!canvas) {
+                alert('Please generate a mind map first!');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.download = `mindmap-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Add user message
+            chatHistory.push({user: message, ai: '...'});
+            renderChat();
+            input.value = '';
+
+            // Generate AI response
+            const prompt = currentLanguage === 'hi' ?
+                `संदर्भ: ${uploadedText}\n\nप्रश्न: ${message}\n\nहिंदी में उत्तर दें:` :
+                `Context: ${uploadedText}\n\nQuestion: ${message}\n\nAnswer:`;
+
+            try {
+                const aiResponse = await callAI(prompt);
+                chatHistory[chatHistory.length - 1].ai = aiResponse;
+            } catch (error) {
+                // Use local answer generation
+                const aiResponse = answerQuestion(message, uploadedText);
+                chatHistory[chatHistory.length - 1].ai = aiResponse;
+            }
+            renderChat();
+        }
+
+        function renderChat() {
+            const chatDiv = document.getElementById('chatMessages');
+            chatDiv.innerHTML = '';
+            chatHistory.forEach(msg => {
+                chatDiv.innerHTML += `
+                    <p><strong>You:</strong> ${msg.user}</p>
+                    <p><strong>AI:</strong> ${msg.ai}</p>
+                    <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid #eee;">
+                `;
+            });
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
+
+        // Allow Enter key to send message
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatInput = document.getElementById('chatInput');
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+        
+        // Navigation menu toggle
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const nav = document.querySelector('nav');
+            const navLinks = document.getElementById('navLinks');
+            
+            if (!nav.contains(event.target) && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
