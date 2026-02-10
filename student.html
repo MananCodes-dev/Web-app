@@ -3478,6 +3478,7 @@
         }
 
         function setupCanvasInteraction() {
+            // Mouse drag
             canvas.addEventListener('mousedown', (e) => {
                 isDragging = true;
                 dragStartX = e.clientX - offsetX;
@@ -3500,27 +3501,99 @@
                 isDragging = false;
             });
             
-            // Touch support
+            // Mouse wheel zoom (for touchpad scroll)
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                // Zoom factor
+                const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+                const newScale = Math.max(0.3, Math.min(3, scale * zoomFactor));
+                
+                // Zoom towards mouse position
+                const scaleChange = newScale / scale;
+                offsetX = mouseX - (mouseX - offsetX) * scaleChange;
+                offsetY = mouseY - (mouseY - offsetY) * scaleChange;
+                
+                scale = newScale;
+                drawMindMap();
+            }, { passive: false });
+            
+            // Touch support with pinch-to-zoom
+            let lastTouchDistance = 0;
+            
             canvas.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                const touch = e.touches[0];
-                isDragging = true;
-                dragStartX = touch.clientX - offsetX;
-                dragStartY = touch.clientY - offsetY;
-            });
+                
+                if (e.touches.length === 1) {
+                    // Single touch - pan
+                    const touch = e.touches[0];
+                    isDragging = true;
+                    dragStartX = touch.clientX - offsetX;
+                    dragStartY = touch.clientY - offsetY;
+                } else if (e.touches.length === 2) {
+                    // Two fingers - prepare for pinch zoom
+                    isDragging = false;
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    lastTouchDistance = Math.hypot(
+                        touch2.clientX - touch1.clientX,
+                        touch2.clientY - touch1.clientY
+                    );
+                }
+            }, { passive: false });
             
             canvas.addEventListener('touchmove', (e) => {
                 e.preventDefault();
-                if (isDragging) {
+                
+                if (e.touches.length === 1 && isDragging) {
+                    // Single touch - pan
                     const touch = e.touches[0];
                     offsetX = touch.clientX - dragStartX;
                     offsetY = touch.clientY - dragStartY;
                     drawMindMap();
+                } else if (e.touches.length === 2) {
+                    // Two fingers - pinch zoom
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    
+                    const currentDistance = Math.hypot(
+                        touch2.clientX - touch1.clientX,
+                        touch2.clientY - touch1.clientY
+                    );
+                    
+                    if (lastTouchDistance > 0) {
+                        const rect = canvas.getBoundingClientRect();
+                        const centerX = (touch1.clientX + touch2.clientX) / 2 - rect.left;
+                        const centerY = (touch1.clientY + touch2.clientY) / 2 - rect.top;
+                        
+                        // Calculate zoom
+                        const zoomFactor = currentDistance / lastTouchDistance;
+                        const newScale = Math.max(0.3, Math.min(3, scale * zoomFactor));
+                        
+                        // Zoom towards pinch center
+                        const scaleChange = newScale / scale;
+                        offsetX = centerX - (centerX - offsetX) * scaleChange;
+                        offsetY = centerY - (centerY - offsetY) * scaleChange;
+                        
+                        scale = newScale;
+                        drawMindMap();
+                    }
+                    
+                    lastTouchDistance = currentDistance;
                 }
-            });
+            }, { passive: false });
             
-            canvas.addEventListener('touchend', () => {
-                isDragging = false;
+            canvas.addEventListener('touchend', (e) => {
+                if (e.touches.length < 2) {
+                    lastTouchDistance = 0;
+                }
+                if (e.touches.length === 0) {
+                    isDragging = false;
+                }
             });
         }
 
